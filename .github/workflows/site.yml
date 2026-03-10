@@ -18,5 +18,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./status-website/public
+          publish_dir: site/status-page/__sapper__/export/
           cname: status.nomercy.tv
