@@ -38,6 +38,13 @@ status-website:
       --text-primary: #e0e0e0;
       --text-secondary: #888;
       --text-heading: #fff;
+      --up-border-left-color: #6c63ff;
+      --up-color-color: #9f9bff;
+      --tag-up-background-color: #6c63ff;
+      --down-border-left-color: #ef4444;
+      --tag-down-background-color: #ef4444;
+      --degraded-border-left-color: #f59e0b;
+      --tag-degraded-background-color: #f59e0b;
     }
     * { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
     body { background: var(--bg-primary) !important; color: var(--text-primary) !important; }
@@ -46,12 +53,20 @@ status-website:
     h1, h2, h3, h4 { color: var(--text-heading) !important; letter-spacing: -0.3px; }
     a { color: var(--accent-light) !important; }
     a:hover { color: var(--accent) !important; }
+    article { background: var(--bg-panel) !important; border: 1px solid var(--border-color) !important; border-radius: 8px !important; box-shadow: none !important; }
+    article.up { border-left: 3px solid var(--accent) !important; }
+    article.down { border-left: 3px solid #ef4444 !important; }
+    article.degraded { border-left: 3px solid #f59e0b !important; }
+    .tag.up, .tag.closed { background: var(--accent) !important; color: #fff !important; }
+    .tag.down, .tag.open { background: #ef4444 !important; color: #fff !important; }
+    .tag.degraded { background: #f59e0b !important; color: #fff !important; }
     .card, .shadow, [class*="shadow"] { background: var(--bg-panel) !important; border: 1px solid var(--border-color) !important; border-radius: 8px !important; box-shadow: none !important; }
-    .badge-success, .badge-up { background: #22c55e !important; }
+    .badge-success, .badge-up { background: var(--accent) !important; }
     .badge-danger, .badge-down { background: #ef4444 !important; }
     footer { background: var(--bg-panel) !important; border-top: 1px solid var(--border-color) !important; }
     .text-muted { color: var(--text-secondary) !important; }
-    .status-up { color: #22c55e !important; }
+    .data { background: rgba(108, 99, 255, 0.1) !important; color: var(--accent-light) !important; }
+    .status-up { color: var(--accent-light) !important; }
     .status-down { color: #ef4444 !important; }
     .btn-primary, .btn-outline-primary { background: var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; border-radius: 6px !important; }
     .btn-primary:hover, .btn-outline-primary:hover { background: var(--accent-light) !important; }
