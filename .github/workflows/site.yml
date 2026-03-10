@@ -1,0 +1,22 @@
+name: Static Site CI
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+jobs:
+  release:
+    name: Build status website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: upptime/uptime-monitor@v1.38.6
+        with:
+          command: "site"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./status-website/public
+          cname: status.nomercy.tv

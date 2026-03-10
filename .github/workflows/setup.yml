@@ -1,0 +1,28 @@
+name: Setup CI
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+jobs:
+  release:
+    name: Initial setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: upptime/uptime-monitor@v1.38.6
+        with:
+          command: "update"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+      - uses: upptime/uptime-monitor@v1.38.6
+        with:
+          command: "site"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./status-website/public
+          cname: status.nomercy.tv
