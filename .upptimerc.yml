@@ -23,6 +23,7 @@ status-website:
   name: NoMercy Status
   theme: dark
   logoUrl: https://nomercy.tv/favicon.ico
+  faviconUrl: https://nomercy.tv/favicon.ico
   navbar:
     - title: Homepage
       href: https://nomercy.tv
