@@ -1,0 +1,46 @@
+owner: NoMercy-Entertainment
+repo: nomercy-status
+
+sites:
+  - name: Website
+    url: https://nomercy.tv
+    icon: https://nomercy.tv/favicon.ico
+
+  - name: API
+    url: https://api.nomercy.tv
+    icon: https://nomercy.tv/favicon.ico
+
+  - name: CDN
+    url: https://cdn.nomercy.tv
+    icon: https://nomercy.tv/favicon.ico
+
+  - name: Authentication
+    url: https://auth.nomercy.tv
+    icon: https://nomercy.tv/favicon.ico
+
+status-website:
+  cname: status.nomercy.tv
+  name: NoMercy Status
+  theme: dark
+  logoUrl: https://nomercy.tv/favicon.ico
+  navbar:
+    - title: Homepage
+      href: https://nomercy.tv
+
+i18n:
+  activeIncidents: Ongoing Incidents
+  allSystemsOperational: All systems operational
+  incidentReport: Incident Report
+
+workflowSchedule:
+  graphs: "0 0 * * *"
+  responseTime: "0 23 * * *"
+  staticSite: "0 1 * * *"
+  summary: "0 0 * * *"
+  updateTemplate: "0 0 * * *"
+  updates: "*/5 * * * *"
+
+commitMessages:
+  statusChange: "🔔 $SITE_NAME is $STATUS ($RESPONSE_CODE in $RESPONSE_TIME ms)"
+  graphsUpdate: "📊 Update graphs"
+  summaryUpdate: "📊 Update summary"
