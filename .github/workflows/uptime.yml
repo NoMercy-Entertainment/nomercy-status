@@ -13,4 +13,4 @@ jobs:
         with:
           command: "update"
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_PAT: ${{ secrets.PAT }}
