@@ -6,7 +6,7 @@ on:
 jobs:
   release:
     name: Measure response time
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, beast-unit]
     steps:
       - uses: actions/checkout@v4
       - uses: upptime/uptime-monitor@v1.41.0
