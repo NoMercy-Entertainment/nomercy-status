@@ -128,4 +128,83 @@ ${note}
   });
 }
 
+export function sparklinePath(days, width = 600, height = 90) {
+  const points = days
+    .map((day, index) => ({ index, value: day.avgResponseTimeMs }))
+    .filter((point) => typeof point.value === "number");
+  if (points.length < 2) return "";
+
+  const values = points.map((point) => point.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const lastIndex = days.length - 1 || 1;
+  const pad = 6;
+  const usable = height - pad * 2;
+
+  return points
+    .map((point, i) => {
+      const x = (point.index / lastIndex) * width;
+      const y = pad + (1 - (point.value - min) / span) * usable;
+      return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+}
+
+export function renderDetail({ service, generatedAt, repoUrl }) {
+  const stats = summarise(service.days);
+  const observed = stats.uptimePct === null ? "—" : `${stats.uptimePct.toFixed(2)}%`;
+  const path = sparklinePath(service.days);
+
+  const windows = [
+    ["24 hours", service.uptimeDay, service.timeDay],
+    ["7 days", service.uptimeWeek, service.timeWeek],
+    ["30 days", service.uptimeMonth, service.timeMonth],
+    ["1 year", service.uptimeYear, service.timeYear],
+  ];
+
+  return layout({
+    title: `${service.name} — NoMercy Status`,
+    body: `${topbar("detail")}
+<h1>${escapeHtml(service.name)}</h1>
+<p><a href="${escapeHtml(service.url)}">${escapeHtml(service.url)}</a> ·
+   <span class="tag ${escapeHtml(service.status)}">${escapeHtml(service.status)}</span></p>
+
+<div class="stats">
+${windows
+  .map(
+    ([label, uptime, time]) => `  <div class="stat">
+    <b>${escapeHtml(uptime ?? "—")}</b>
+    <span>${escapeHtml(label)}${time == null ? "" : ` · ${escapeHtml(String(time))} ms`}</span>
+  </div>`
+  )
+  .join("\n")}
+</div>
+
+<h2>Last ${service.days.length} days</h2>
+${renderBar(service.days)}
+<div class="bar-legend">
+  <span>${service.days.length} days ago</span>
+  <span>${observed} uptime observed</span>
+  <span>Today</span>
+</div>
+${legend()}
+
+<h2>Response time</h2>
+${
+  path
+    ? `<svg class="sparkline" viewBox="0 0 600 90" preserveAspectRatio="none" role="img" aria-label="Daily mean response time"><path d="${path}"/></svg>`
+    : `<p class="note">Not enough response-time data to plot yet.</p>`
+}
+
+<footer>
+  Updated <time datetime="${generatedAt.toISOString()}">${generatedAt
+      .toISOString()
+      .replace("T", " ")
+      .slice(0, 16)} UTC</time> ·
+  <a href="${escapeHtml(repoUrl)}/issues?q=label%3Astatus">Incident history</a>
+</footer>`,
+  });
+}
+
 export { layout, topbar, legend };
