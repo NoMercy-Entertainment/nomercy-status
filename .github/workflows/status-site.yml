@@ -18,6 +18,12 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT || github.token }}
+      # Nothing else in this repo runs `node` directly, so the self-hosted runner is
+      # not guaranteed to have one -- and `observations.at(-1)` needs >= 16.6.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - name: Run tests
         run: node --test tools/test/*.test.mjs
       - name: Build
