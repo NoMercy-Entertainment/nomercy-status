@@ -1,6 +1,13 @@
 owner: NoMercy-Entertainment
 repo: nomercy-status
 
+# Upptime will otherwise set the repo description, homepage and topics for you.
+# All three are already set here, so those calls short-circuit anyway — pinning
+# them off keeps it that way, so GH_PAT never needs repo Administration rights.
+skipDescriptionUpdate: true
+skipHomepageUpdate: true
+skipTopicsUpdate: true
+
 # Workflows are GENERATED from this file by `upptime update-template`.
 # Never hand-edit .github/workflows/*.yml — change the config here instead.
 # The self-hosted fleet is declared as a string because Upptime interpolates
