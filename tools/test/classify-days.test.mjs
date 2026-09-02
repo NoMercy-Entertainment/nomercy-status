@@ -96,6 +96,48 @@ test("summarise reports null uptime when nothing was observed", () => {
   assert.equal(summarise([{ date: "d", status: "nodata", checks: 0, avgResponseTimeMs: null }]).uptimePct, null);
 });
 
+test("a quiet day inside a short gap carries forward 'down' status", () => {
+  // Verify that the carry-forward actually propagates 'down', not silently
+  // converting to 'up'. This catches mutations of status = before.status → status = "up".
+  const days = classifyDays(
+    [obs("2026-05-10T23:00:00Z", "down"), obs("2026-05-12T01:00:00Z", "down")],
+    new Date("2026-05-12T12:00:00Z"), 3
+  );
+  assert.equal(statusOn(days, "2026-05-11"), "down");
+  assert.equal(days.find((d) => d.date === "2026-05-11").checks, 0);
+});
+
+test("a quiet day inside a short gap carries forward 'degraded' status", () => {
+  // Verify that the carry-forward propagates 'degraded', not 'up'.
+  // This catches mutations of status = before.status → status = "up".
+  const days = classifyDays(
+    [obs("2026-05-10T23:00:00Z", "degraded"), obs("2026-05-12T01:00:00Z", "degraded")],
+    new Date("2026-05-12T12:00:00Z"), 3
+  );
+  assert.equal(statusOn(days, "2026-05-11"), "degraded");
+  assert.equal(days.find((d) => d.date === "2026-05-11").checks, 0);
+});
+
+test("last observation as 'down' within 48h of final day carries forward", () => {
+  // Trailing-edge carry-forward: the last observation was 'down' less than
+  // 48 hours before the final day. That day must be 'down', not 'up'.
+  const days = classifyDays(
+    [obs("2026-09-01T23:00:00Z", "down")], new Date("2026-09-02T09:00:00Z"), 2
+  );
+  assert.equal(statusOn(days, "2026-09-02"), "down");
+});
+
+test("exactly 48 hours is the boundary: silence >= 48h becomes nodata", () => {
+  // The gap boundary uses strict <, so exactly 48h is nodata, not carry-forward.
+  // Start at 2026-05-10T12:00:00Z, end at 2026-05-12T12:00:00Z (exactly 48h).
+  const days = classifyDays(
+    [obs("2026-05-10T12:00:00Z", "up"), obs("2026-05-12T12:00:00Z", "up")],
+    new Date("2026-05-12T12:00:00Z"), 3
+  );
+  // 2026-05-11 is inside the silence and at the boundary, so it should be nodata.
+  assert.equal(statusOn(days, "2026-05-11"), "nodata");
+});
+
 import { readObservations } from "../lib/parse-history.mjs";
 
 test("real history: the known March/April outages classify as down", () => {

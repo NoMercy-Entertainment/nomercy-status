@@ -71,6 +71,8 @@ export function classifyDays(observations, endDate, dayCount, gapHours = 48) {
       const silence = after
         ? after.at.getTime() - before.at.getTime()
         : dayStart - before.at.getTime();
+      // Carry forward previous status only if silence is strictly less than gapHours.
+      // At exactly gapHours or longer, report nodata (the monitoring pipeline was not running).
       if (silence < gapMs) status = before.status;
     }
 
