@@ -9,7 +9,7 @@ jobs:
     runs-on: [self-hosted, Linux, X64, beast-unit]
     steps:
       - uses: actions/checkout@v4
-      - uses: upptime/uptime-monitor@v1.41.0
+      - uses: upptime/uptime-monitor@v1.43.16
         with:
           command: "response-time"
         env:
