@@ -18,10 +18,26 @@ export function buildSite({
 } = {}) {
   const summary = JSON.parse(readFileSync(join(cwd, "history", "summary.json"), "utf8"));
 
-  const services = summary.map((entry) => ({
-    ...entry,
-    days: classifyDays(readObservations(entry.slug, cwd), endDate, dayCount),
-  }));
+  // `generatedAt` is derived from the data (the newest observation across every service),
+  // not from the wall clock. `endDate` still controls where the 90-day window ends and
+  // defaults to now, but rendering the current instant into every page's "Updated" footer
+  // would make two builds of the same data differ byte-for-byte, which in turn defeats the
+  // `git diff --cached --quiet` idempotence gate the scheduled workflow relies on. "Updated"
+  // should mean "data as of", not "HTML rebuilt at" — if data stops flowing, this timestamp
+  // going stale is the correct, truthful behaviour.
+  let newestObservedAt = null;
+
+  const services = summary.map((entry) => {
+    const observations = readObservations(entry.slug, cwd);
+    const latest = observations.at(-1)?.at;
+    if (latest && (!newestObservedAt || latest > newestObservedAt)) newestObservedAt = latest;
+    return {
+      ...entry,
+      days: classifyDays(observations, endDate, dayCount),
+    };
+  });
+
+  const generatedAt = newestObservedAt ?? endDate;
 
   // The illustration is chosen after the build exists, so treat it as optional.
   const hero = existsSync(heroPath) ? readFileSync(heroPath, "utf8") : "";
@@ -36,12 +52,12 @@ export function buildSite({
     written.push(relativePath);
   };
 
-  write("index.html", renderIndex({ services, generatedAt: endDate, hero, repoUrl: REPO_URL, i18n }));
+  write("index.html", renderIndex({ services, generatedAt, hero, repoUrl: REPO_URL, i18n }));
 
   for (const service of services) {
     write(
       join("history", service.slug, "index.html"),
-      renderDetail({ service, generatedAt: endDate, repoUrl: REPO_URL })
+      renderDetail({ service, generatedAt, repoUrl: REPO_URL })
     );
   }
 

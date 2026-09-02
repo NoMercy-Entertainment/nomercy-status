@@ -11,14 +11,14 @@ test("builds a landing page and one detail page per service", () => {
   const outDir = out();
   const { services, written } = buildSite({ outDir, endDate: new Date("2026-09-02T12:00:00Z"), dayCount: 90 });
 
-  assert.ok(services.length >= 7, `expected >= 7 services, got ${services.length}`);
+  assert.equal(services.length, 7, `expected exactly 7 services, got ${services.length}`);
   assert.ok(existsSync(join(outDir, "index.html")));
   assert.ok(existsSync(join(outDir, "status.css")));
   assert.ok(existsSync(join(outDir, "status.js")));
   for (const service of services) {
     assert.ok(existsSync(join(outDir, "history", service.slug, "index.html")), `missing detail: ${service.slug}`);
   }
-  assert.ok(written.length >= 3 + services.length);
+  assert.equal(written.length, 3 + services.length);
 });
 
 test("every service gets exactly dayCount bar segments", () => {
@@ -42,4 +42,19 @@ test("a missing hero is not fatal", () => {
   const outDir = out();
   buildSite({ outDir, endDate: new Date("2026-09-02T12:00:00Z"), dayCount: 90, heroPath: "does-not-exist.svg" });
   assert.ok(readFileSync(join(outDir, "index.html"), "utf8").includes("card-grid"));
+});
+
+test("two builds produce byte-identical output", () => {
+  // No endDate is pinned here, deliberately: this mirrors exactly how the CLI invokes
+  // buildSite() (endDate defaults to `new Date()` at full millisecond precision on every
+  // call). generatedAt must be derived from the data (the newest observation timestamp),
+  // not from that wall-clock default, or every build churns even when nothing changed.
+  const outDirA = out();
+  const outDirB = out();
+  buildSite({ outDir: outDirA, dayCount: 90 });
+  buildSite({ outDir: outDirB, dayCount: 90 });
+
+  const htmlA = readFileSync(join(outDirA, "index.html"), "utf8");
+  const htmlB = readFileSync(join(outDirB, "index.html"), "utf8");
+  assert.equal(htmlA, htmlB, "index.html must be byte-identical across two builds run moments apart");
 });
