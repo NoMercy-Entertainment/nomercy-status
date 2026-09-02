@@ -1,0 +1,66 @@
+<svg viewBox="0 0 960 220" preserveAspectRatio="xMidYMid meet" role="img" aria-label="A signal travelling left to right through relay nodes to a screen" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Signal flow, minimal. No characters. The whole composition is one
+       horizontal reading: origin, relays, waveform, arrival. Restraint is
+       the point, so almost everything sits at low opacity and the accent
+       carries the single live path. -->
+
+  <!-- baseline -->
+  <path d="M60 190 H900" opacity="0.2" />
+
+  <!-- origin tower -->
+  <g>
+    <path d="M104 190 L128 76 L152 190" opacity="0.7" />
+    <path d="M112 154 H144" opacity="0.5" />
+    <path d="M118 124 H138" opacity="0.5" />
+    <circle cx="128" cy="68" r="5" fill="var(--accent)" stroke="none" />
+    <g opacity="0.45" stroke="var(--accent)">
+      <path d="M112 56 a22 22 0 0 1 32 0" />
+      <path d="M100 44 a40 40 0 0 1 56 0" />
+    </g>
+  </g>
+
+  <!-- the signal: a waveform that starts dense and resolves into a clean line -->
+  <g stroke="var(--accent)">
+    <path d="M168 130
+             l14 -22 l14 44 l14 -52 l14 58 l14 -40 l14 30 l14 -34
+             l16 24 l16 -18 l16 14 l16 -10
+             C 384 122, 400 128, 424 128
+             H 556
+             C 588 128, 604 116, 636 116
+             H 700" />
+  </g>
+
+  <!-- relay nodes along the path -->
+  <g>
+    <circle cx="424" cy="128" r="14" />
+    <circle cx="424" cy="128" r="5" fill="var(--accent)" stroke="none" />
+    <path d="M424 142 V190" opacity="0.3" />
+
+    <circle cx="556" cy="128" r="14" />
+    <circle cx="556" cy="128" r="5" fill="var(--accent)" stroke="none" />
+    <path d="M556 142 V190" opacity="0.3" />
+
+    <circle cx="636" cy="116" r="10" opacity="0.6" />
+    <path d="M636 126 V190" opacity="0.2" />
+  </g>
+
+  <!-- faint parallel channels, suggesting other streams -->
+  <g opacity="0.16">
+    <path d="M200 158 H424 M456 158 H556 M588 158 H700" />
+    <path d="M232 100 H424 M456 100 H556 M588 100 H700" />
+  </g>
+
+  <!-- arrival: screen -->
+  <g>
+    <rect x="700" y="80" width="164" height="104" rx="10" opacity="0.8" />
+    <rect x="714" y="94" width="136" height="76" rx="5" opacity="0.3" />
+    <path d="M772 118 L800 132 L772 146 Z" fill="var(--accent)" stroke="none" />
+  </g>
+
+  <!-- level meter under the screen, the only "data" in the frame -->
+  <g opacity="0.55">
+    <path d="M700 200 v-10 M714 200 v-16 M728 200 v-22 M742 200 v-14
+             M756 200 v-20 M770 200 v-26 M784 200 v-12 M798 200 v-18
+             M812 200 v-24 M826 200 v-10 M840 200 v-16 M854 200 v-8" />
+  </g>
+</svg>
