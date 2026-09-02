@@ -24,7 +24,7 @@ export function renderBar(days) {
       const detail = day.checks
         ? `${day.checks} check${day.checks === 1 ? "" : "s"}`
         : DAY_LABEL[day.status];
-      return `<i class="bar-day ${day.status}" title="${escapeHtml(day.date)} — ${escapeHtml(
+      return `<i class="bar-day ${escapeHtml(day.status)}" title="${escapeHtml(day.date)} — ${escapeHtml(
         DAY_LABEL[day.status]
       )}${day.checks ? ` (${escapeHtml(detail)})` : ""}"></i>`;
     })

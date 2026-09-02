@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { renderIndex, overallStatus, renderBar } from "../lib/render-page.mjs";
+import { escapeHtml } from "../lib/html.mjs";
 
 const days = (statuses) => statuses.map((status, i) => ({
   date: `2026-06-${String(i + 1).padStart(2, "0")}`,
@@ -80,4 +81,11 @@ test("service names are HTML-escaped", () => {
 test("a nodata stretch produces an explanatory note", () => {
   const html = renderIndex(opts([service({ days: days(["nodata", "nodata", "up"]) })]));
   assert.match(html, /monitoring/i);
+});
+
+test("renderBar HTML-escapes day.status in the class attribute", () => {
+  const malicious = [{ date: "2026-06-01", status: '"><b>x</b>', checks: 1, avgResponseTimeMs: 120 }];
+  const html = renderBar(malicious);
+  assert.ok(!html.includes('"><b>x</b>'));
+  assert.ok(html.includes(escapeHtml('"><b>x</b>')));
 });
