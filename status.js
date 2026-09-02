@@ -91,6 +91,11 @@ export function applyBanner(summary, doc) {
 }
 
 export function applySummary(summary, doc) {
+  // The payload is fetched from a remote file. If it is ever not an array, keep
+  // the build-time values rather than throwing: a stale-but-correct page beats a
+  // blank one, and this is exactly when someone is trying to read it.
+  if (!Array.isArray(summary)) return 0;
+
   const bySlug = new Map(summary.map((entry) => [entry.slug, entry.status]));
   let updated = 0;
   for (const tag of doc.querySelectorAll("[data-status-for]")) {
@@ -116,12 +121,23 @@ if (typeof document !== "undefined") {
   const stored = readStoredTheme(globalThis.localStorage);
   if (stored === "dark" || stored === "light") root.dataset.theme = stored;
 
-  for (const button of document.querySelectorAll("[data-theme-toggle]")) {
+  const toggles = document.querySelectorAll("[data-theme-toggle]");
+
+  // aria-pressed has to track the real state, or a screen reader announces the
+  // opposite of what is on screen -- worse than having no state at all.
+  const syncPressed = () => {
+    const isDark = resolveTheme(root.dataset.theme ?? null, prefersLight()) === "dark";
+    for (const button of toggles) button.setAttribute("aria-pressed", String(isDark));
+  };
+  syncPressed();
+
+  for (const button of toggles) {
     button.addEventListener("click", () => {
       const current = resolveTheme(root.dataset.theme ?? null, prefersLight());
       const next = current === "dark" ? "light" : "dark";
       root.dataset.theme = next;
       writeStoredTheme(globalThis.localStorage, next);
+      syncPressed();
     });
   }
 
