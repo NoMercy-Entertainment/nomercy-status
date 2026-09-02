@@ -12,19 +12,19 @@ export async function evictLegacyServiceWorkers(nav, cacheStore) {
 
   try {
     if (nav?.serviceWorker?.getRegistrations) {
-      for (const registration of await nav.serviceWorker.getRegistrations()) {
-        await registration.unregister();
-        unregistered++;
-      }
+      const registrations = await nav.serviceWorker.getRegistrations();
+      const results = await Promise.allSettled(
+        registrations.map((registration) => registration.unregister())
+      );
+      unregistered += results.filter((r) => r.status === "fulfilled").length;
     }
   } catch { /* nothing useful to do */ }
 
   try {
     if (cacheStore?.keys) {
-      for (const key of await cacheStore.keys()) {
-        await cacheStore.delete(key);
-        cachesDeleted++;
-      }
+      const keys = await cacheStore.keys();
+      const results = await Promise.allSettled(keys.map((key) => cacheStore.delete(key)));
+      cachesDeleted += results.filter((r) => r.status === "fulfilled").length;
     }
   } catch { /* nothing useful to do */ }
 

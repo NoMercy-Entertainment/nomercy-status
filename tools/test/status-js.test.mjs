@@ -50,3 +50,29 @@ test("applySummary ignores services it has no tag for", () => {
   const doc = { querySelectorAll: () => [] };
   assert.equal(applySummary([{ slug: "ghost", status: "down" }], doc), 0);
 });
+
+test("a rejecting unregister() does not abort the remaining registrations", async () => {
+  const unregisteredOrder = [];
+  const nav = { serviceWorker: { getRegistrations: async () => [
+    { unregister: async () => { unregisteredOrder.push(1); return true; } },
+    { unregister: async () => { throw new Error("boom"); } },
+    { unregister: async () => { unregisteredOrder.push(3); return true; } },
+  ] } };
+
+  const result = await evictLegacyServiceWorkers(nav, undefined);
+  assert.deepEqual(unregisteredOrder, [1, 3]);
+  assert.equal(result.unregistered, 2);
+});
+
+test("a rejecting cache delete() does not abort the remaining keys", async () => {
+  const deletedOrder = [];
+  const caches = { keys: async () => ["a", "b", "c"], delete: async (k) => {
+    if (k === "b") throw new Error("boom");
+    deletedOrder.push(k);
+    return true;
+  } };
+
+  const result = await evictLegacyServiceWorkers({}, caches);
+  assert.deepEqual(deletedOrder, ["a", "c"]);
+  assert.equal(result.cachesDeleted, 2);
+});
