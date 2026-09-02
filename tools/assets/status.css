@@ -1,5 +1,9 @@
-/* Generated-page stylesheet. Palette: NoMercy design system (Moooom).
-   Dark is the default; light is opt-in via prefers-color-scheme or the toggle. */
+/* Generated-page stylesheet. Palette: NoMercy design system (Moooom), Radix-based.
+   Dark is the default (bare :root); light is opt-in via prefers-color-scheme or the
+   toggle. The emitted HTML must NOT carry data-theme, or the media query below can
+   never match. Steps are chosen for measured contrast, not for looks: every text
+   pairing clears 4.5:1 and every bar/graphic colour clears 3:1 against --bg-panel.
+   tools/test/contrast.test.mjs parses these values and asserts exactly that. */
 
 :root {
   --bg-primary: #111113;      /* slate-1  */
@@ -19,29 +23,33 @@
   --down-solid: #e5484d;      /* red-9    */
   --down-surface: #3b1219;    /* red-3    */
   --down-text: #ff9592;       /* red-11   */
-  --nodata: #363a3f;          /* slate-6  */
+  --nodata: #696e77;          /* slate-9 — slate-6 was 1.54:1 on the panel, invisible */
   color-scheme: dark;
 }
 
+/* Keep the two light blocks below byte-identical in their values; the contrast test
+   asserts it, because a token defined in only one of them silently keeps its dark
+   value for readers who never touched the toggle. */
+
 [data-theme="light"] {
-  --bg-primary: #f9f9fb;
-  --bg-panel: #fcfcfd;
-  --bg-raised: #f0f0f3;
-  --border-color: #d9d9e0;
-  --text-primary: #1c2024;
-  --text-secondary: #60646c;
-  --accent: #12a594;
-  --accent-light: #008573;
-  --up-solid: #46a758;
-  --up-surface: #e9f6e9;
-  --up-text: #2a7e3b;
-  --degraded-solid: #ffc53d;
-  --degraded-surface: #fff7c2;
-  --degraded-text: #ab6400;
-  --down-solid: #e5484d;
-  --down-surface: #feebec;
-  --down-text: #ce2c31;
-  --nodata: #d9d9e0;
+  --bg-primary: #f9f9fb;      /* slate-2  */
+  --bg-panel: #fcfcfd;        /* slate-1  */
+  --bg-raised: #f0f0f3;       /* slate-3  */
+  --border-color: #d9d9e0;    /* slate-6  */
+  --text-primary: #1c2024;    /* slate-12 */
+  --text-secondary: #60646c;  /* slate-11 */
+  --accent: #0d9b8a;          /* teal-10 — teal-9 was 2.92:1 for the sparkline */
+  --accent-light: #0d3d38;    /* teal-12 — teal-11 was 4.34:1 on --bg-primary */
+  --up-solid: #3e9b4f;        /* grass-10 — grass-9 was 2.96:1 on the panel */
+  --up-surface: #e9f6e9;      /* grass-3  */
+  --up-text: #2a7e3b;         /* grass-11 */
+  --degraded-solid: #ab6400;  /* amber-11 — amber-9 was 1.54:1 on the panel */
+  --degraded-surface: #fff7c2;/* amber-3  */
+  --degraded-text: #4f3422;   /* amber-12 — amber-11 on amber-3 was 4.25:1 */
+  --down-solid: #e5484d;      /* red-9    */
+  --down-surface: #feebec;    /* red-3    */
+  --down-text: #ce2c31;       /* red-11   */
+  --nodata: #8b8d98;          /* slate-9 — slate-6 was 1.37:1, the outage band vanished */
   color-scheme: light;
 }
 
@@ -53,14 +61,18 @@
     --border-color: #d9d9e0;
     --text-primary: #1c2024;
     --text-secondary: #60646c;
-    --accent-light: #008573;
+    --accent: #0d9b8a;
+    --accent-light: #0d3d38;
+    --up-solid: #3e9b4f;
     --up-surface: #e9f6e9;
     --up-text: #2a7e3b;
+    --degraded-solid: #ab6400;
     --degraded-surface: #fff7c2;
-    --degraded-text: #ab6400;
+    --degraded-text: #4f3422;
+    --down-solid: #e5484d;
     --down-surface: #feebec;
     --down-text: #ce2c31;
-    --nodata: #d9d9e0;
+    --nodata: #8b8d98;
     color-scheme: light;
   }
 }
@@ -111,9 +123,12 @@ h2 { font-size: 15px; letter-spacing: -0.2px; margin: 0; }
 @media (max-width: 720px) { .card-grid { grid-template-columns: 1fr; } }
 
 .card { background: var(--bg-panel); padding: 18px; }
-.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
 .card-head a { color: var(--text-primary); text-decoration: none; }
 .card-head a:hover { color: var(--accent-light); }
+
+.card-meta { margin: 0 0 12px; font-size: 12px; color: var(--text-secondary); }
+.card-meta b { color: var(--text-primary); font-weight: 600; }
 
 .tag { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
 .tag.up { background: var(--up-surface); color: var(--up-text); }
