@@ -147,3 +147,15 @@ test("a rejecting cache delete() does not abort the remaining keys", async () =>
   assert.deepEqual(deletedOrder, ["a", "c"]);
   assert.equal(result.cachesDeleted, 2);
 });
+
+test("applySummary keeps build-time values on a malformed payload", () => {
+  // A blank status page is the worst possible failure mode, so a bad payload
+  // must be ignored rather than thrown on.
+  const tag = { className: "tag up", textContent: "up", dataset: { statusFor: "api" } };
+  const doc = { querySelectorAll: () => [tag] };
+  for (const payload of [null, undefined, {}, "down", 42]) {
+    assert.equal(applySummary(payload, doc), 0);
+    assert.equal(tag.textContent, "up", "must not disturb the rendered value");
+    assert.equal(tag.className, "tag up");
+  }
+});

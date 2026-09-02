@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { renderIndex, overallStatus, renderBar, uptimeLabel, barLabel } from "../lib/render-page.mjs";
 import { escapeHtml } from "../lib/html.mjs";
 
@@ -199,4 +200,29 @@ test("no heroes renders no hero block at all", () => {
   const html = renderIndex({ ...opts([service()]), heroes: [] });
   assert.doesNotMatch(html, /class="hero"/);
   assert.doesNotMatch(html, /Math\.random/);
+});
+
+// --- head metadata and control state -----------------------------------------
+// These exist because an earlier accidental revert of render-page.mjs went
+// undetected: nothing asserted the description or the toggle's state, so the
+// suite stayed green while both silently disappeared.
+
+test("the landing page declares a meta description", () => {
+  const html = renderIndex(opts([service(), service({ name: "API", slug: "api" })]));
+  const meta = html.match(/<meta name="description" content="([^"]+)">/);
+  assert.ok(meta, "no meta description");
+  assert.match(meta[1], /2 NoMercy services/);
+});
+
+test("the theme toggle exposes a pressed state", () => {
+  const html = renderIndex(opts([service()]));
+  assert.match(html, /data-theme-toggle[^>]*aria-pressed="(true|false)"/);
+});
+
+test("the ranking rule is the shared one, not a local copy", () => {
+  // A second copy of the rule inside the renderer could disagree with the day
+  // classifier, and the banner would contradict the bars beneath it.
+  const src = readFileSync(new URL("../lib/render-page.mjs", import.meta.url), "utf8");
+  assert.doesNotMatch(src, /const RANK\s*=/, "render-page must not define its own RANK");
+  assert.match(src, /from "\.\/status-rank\.mjs"/);
 });

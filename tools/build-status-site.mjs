@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { readObservations } from "./lib/parse-history.mjs";
 import { classifyDays } from "./lib/classify-days.mjs";
 import { renderIndex, renderDetail } from "./lib/render-page.mjs";
+import { readI18n } from "./lib/config-block.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_URL = "https://github.com/NoMercy-Entertainment/nomercy-status";
@@ -18,7 +19,23 @@ export function buildSite({
   // parked there would be lost the first time someone wiped it and rebuilt.
   heroesDir = join(HERE, "assets", "heroes"),
 } = {}) {
-  const summary = JSON.parse(readFileSync(join(cwd, "history", "summary.json"), "utf8"));
+  // This runs unattended on a schedule, so a bad read must say what is wrong and
+  // where. A raw ENOENT or SyntaxError in a CI log costs whoever reads it a
+  // detour through the stack trace to work out which file was even involved.
+  const summaryPath = join(cwd, "history", "summary.json");
+  let summary;
+  try {
+    summary = JSON.parse(readFileSync(summaryPath, "utf8"));
+  } catch (cause) {
+    const reason =
+      cause.code === "ENOENT"
+        ? "the file does not exist — has Upptime run yet?"
+        : `it is not valid JSON (${cause.message})`;
+    throw new Error(`Cannot read ${summaryPath}: ${reason}`, { cause });
+  }
+  if (!Array.isArray(summary)) {
+    throw new Error(`Expected ${summaryPath} to contain an array of services, got ${typeof summary}`);
+  }
 
   // `generatedAt` is derived from the data (the newest observation across every service),
   // not from the wall clock. `endDate` still controls where the 90-day window ends and
@@ -51,7 +68,10 @@ export function buildSite({
         .map((name) => readFileSync(join(heroesDir, name), "utf8").trim())
     : [];
 
-  const i18n = { allSystemsOperational: "All systems operational", activeIncidents: "Ongoing Incidents" };
+  // Wording comes from .upptimerc.yml so the banner can be changed without
+  // touching code, falling back per-key if the block is absent or partial.
+  const configPath = join(cwd, ".upptimerc.yml");
+  const i18n = readI18n(existsSync(configPath) ? readFileSync(configPath, "utf8") : "");
   const written = [];
 
   const write = (relativePath, content) => {

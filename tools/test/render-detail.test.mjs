@@ -36,12 +36,36 @@ test("detail page names the service and links its real target URL", () => {
   assert.ok(html.includes("https://api.nomercy.tv/v1/server"));
 });
 
-test("detail page shows all four uptime windows", () => {
-  const html = renderDetail(opts());
-  for (const label of ["24 hours", "7 days", "30 days", "1 year"]) {
-    assert.ok(html.includes(label), `missing window: ${label}`);
+test("each uptime window shows its OWN value, not merely some value", () => {
+  // Distinct values per window on purpose. The previous version of this test
+  // asserted only that each label and one percentage appeared somewhere in the
+  // document, so swapping uptimeWeek with uptimeMonth would still have passed.
+  const html = renderDetail(
+    opts({
+      service: service({
+        uptimeDay: "11.11%",
+        uptimeWeek: "22.22%",
+        uptimeMonth: "33.33%",
+        uptimeYear: "44.44%",
+        timeDay: 111,
+        timeWeek: 222,
+        timeMonth: 333,
+        timeYear: 444,
+      }),
+    })
+  );
+
+  const pairs = [
+    ["24 hours", "11.11%", "111"],
+    ["7 days", "22.22%", "222"],
+    ["30 days", "33.33%", "333"],
+    ["1 year", "44.44%", "444"],
+  ];
+
+  for (const [label, uptime, ms] of pairs) {
+    const paired = new RegExp(`<b>${uptime.replace(".", "\\.")}</b>\\s*<span>${label} · ${ms} ms</span>`);
+    assert.match(html, paired, `${label} is not paired with ${uptime} / ${ms} ms`);
   }
-  assert.ok(html.includes("99.90%"));
 });
 
 test("detail page includes the 90-day bar and a sparkline", () => {
