@@ -14,7 +14,9 @@ export function buildSite({
   outDir = join(HERE, "..", "assets"),
   endDate = new Date(),
   dayCount = 90,
-  heroPath = join(HERE, "..", "assets", "hero.svg"),
+  // Source, not output: `assets/` is regenerated build output, so an illustration
+  // parked there would be lost the first time someone wiped it and rebuilt.
+  heroPath = join(HERE, "assets", "hero.svg"),
 } = {}) {
   const summary = JSON.parse(readFileSync(join(cwd, "history", "summary.json"), "utf8"));
 
