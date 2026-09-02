@@ -54,6 +54,40 @@ test("detail page links back to the landing page", () => {
   assert.match(renderDetail(opts()), /href="\/"/);
 });
 
+test("detail page tag opts into the live status overlay", () => {
+  // Without this the detail page keeps its build-time status for up to 24h.
+  const html = renderDetail(opts());
+  assert.match(html, /<span class="tag up" data-status-for="api">/);
+});
+
+test("detail page carries status in text and counts in the bar's label", () => {
+  const html = renderDetail(opts());
+  assert.match(html, /class="tag up"[^>]*>up<\/span>/);
+  assert.match(
+    html,
+    /aria-label="Daily status for the last 3 days: 2 days operational, 1 day no monitoring data"/
+  );
+});
+
+test("detail page explains the grey band when there is one", () => {
+  const html = renderDetail(opts());
+  assert.match(html, /no monitoring data — the checks were not running/);
+});
+
+test("detail page omits the grey-band note when every day was observed", () => {
+  const observed = service({
+    days: [day("2026-06-01", "up", 100), day("2026-06-02", "up", 200)],
+  });
+  const html = renderDetail(opts({ service: observed }));
+  assert.ok(!html.includes("the checks were not running"));
+});
+
+test("detail page uses the same honest uptime label as the cards", () => {
+  const html = renderDetail(opts());
+  assert.ok(html.includes("100.00% of 2 days observed"));
+  assert.ok(!html.includes("uptime observed"));
+});
+
 test("detail page escapes the service name", () => {
   const html = renderDetail(opts({ service: service({ name: "<script>x</script>" }) }));
   assert.ok(!html.includes("<script>x</script>"));

@@ -10,30 +10,80 @@ const DAY_LABEL = {
   nodata: "no monitoring data",
 };
 
+const BANNER_I18N = {
+  allSystemsOperational: "All systems operational",
+  activeIncidents: "Ongoing Incidents",
+};
+
+const dayLabel = (status) => DAY_LABEL[status] ?? "unknown status";
+
+const plural = (count, noun) => `${count} ${noun}${count === 1 ? "" : "s"}`;
+
+/**
+ * An unrecognised status must degrade to the WORST case, never the best: a status
+ * page that quietly renders an unknown value as "up" is lying about an outage.
+ */
+export function normaliseStatus(status) {
+  return status === "up" || status === "degraded" || status === "down" ? status : "down";
+}
+
 export function overallStatus(services) {
   let worst = "up";
   for (const service of services) {
-    if ((RANK[service.status] ?? 0) > RANK[worst]) worst = service.status;
+    const status = normaliseStatus(service.status);
+    if (RANK[status] > RANK[worst]) worst = status;
   }
   return worst;
 }
 
+/**
+ * The percentage is computed over OBSERVED days only, so the label must never
+ * present it as if it covered the whole window. When days are missing it states
+ * its own denominator instead.
+ */
+export function uptimeLabel(stats) {
+  if (stats.uptimePct === null) return "No monitoring data";
+  const pct = `${stats.uptimePct.toFixed(2)}%`;
+  if (stats.nodataDays === 0) return `${pct} uptime`;
+  return `${pct} of ${plural(stats.observedDays, "day")} observed`;
+}
+
+/**
+ * `role="img"` hides the per-day elements from assistive tech, so the label has to
+ * carry the information the colours carry. Counts, not just "daily status".
+ */
+export function barLabel(days) {
+  const counts = new Map();
+  for (const day of days) {
+    const label = dayLabel(day.status);
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  const ordered = ["operational", "degraded performance", "outage", "no monitoring data", "unknown status"];
+  const parts = [];
+  for (const label of ordered) if (counts.has(label)) parts.push(`${plural(counts.get(label), "day")} ${label}`);
+  return `Daily status for the last ${days.length} days: ${parts.join(", ")}`;
+}
+
 export function renderBar(days) {
-  return `<div class="bar" role="img" aria-label="Daily status for the last ${days.length} days">${days
+  return `<div class="bar" role="img" aria-label="${escapeHtml(barLabel(days))}">${days
     .map((day) => {
       const detail = day.checks
         ? `${day.checks} check${day.checks === 1 ? "" : "s"}`
-        : DAY_LABEL[day.status];
+        : dayLabel(day.status);
       return `<i class="bar-day ${escapeHtml(day.status)}" title="${escapeHtml(day.date)} — ${escapeHtml(
-        DAY_LABEL[day.status]
+        dayLabel(day.status)
       )}${day.checks ? ` (${escapeHtml(detail)})` : ""}"></i>`;
     })
     .join("")}</div>`;
 }
 
 function layout({ title, body, extraHead = "" }) {
+  // No `data-theme` here on purpose. Baking one in makes the stylesheet's
+  // `prefers-color-scheme` branch unreachable, so light-preference readers get dark
+  // with JS off and a dark->light flash with JS on. The CSS owns the default (dark);
+  // status.js stamps an attribute only for an explicitly stored choice.
   return `<!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -73,20 +123,29 @@ function legend() {
 </div>`;
 }
 
+/** Grey has to be explained wherever it is drawn, not only on the landing page. */
+function nodataNote(days) {
+  if (!days.some((day) => day.status === "nodata")) return "";
+  return `<p class="note">Grey segments are days with no monitoring data — the checks were not running, so uptime is unknown for that period rather than assumed good.</p>`;
+}
+
 function card(service) {
   const stats = summarise(service.days);
-  const uptime = stats.uptimePct === null ? "—" : `${stats.uptimePct.toFixed(2)}%`;
+  const responseTime =
+    service.time == null
+      ? ""
+      : `\n  <p class="card-meta">Response time <b>${escapeHtml(String(service.time))} ms</b></p>`;
   return `<div class="card">
   <div class="card-head">
     <h2><a href="/history/${escapeHtml(service.slug)}/">${escapeHtml(service.name)}</a></h2>
     <span class="tag ${escapeHtml(service.status)}" data-status-for="${escapeHtml(service.slug)}">${escapeHtml(
     service.status
   )}</span>
-  </div>
+  </div>${responseTime}
   ${renderBar(service.days)}
   <div class="bar-legend">
     <span>${service.days.length} days ago</span>
-    <span>${uptime} uptime</span>
+    <span>${escapeHtml(uptimeLabel(stats))}</span>
     <span>Today</span>
   </div>
 </div>`;
@@ -94,23 +153,22 @@ function card(service) {
 
 export function renderIndex({ services, generatedAt, hero, repoUrl, i18n }) {
   const worst = overallStatus(services);
-  const failing = services.filter((s) => s.status !== "up");
+  const failing = services.filter((s) => normaliseStatus(s.status) !== "up");
   const bannerClass = worst === "up" ? "" : worst === "down" ? " is-down" : " is-degraded";
+  const okLabel = i18n?.allSystemsOperational ?? BANNER_I18N.allSystemsOperational;
+  const incidentLabel = i18n?.activeIncidents ?? BANNER_I18N.activeIncidents;
   const bannerText =
-    worst === "up"
-      ? i18n.allSystemsOperational
-      : `${i18n.activeIncidents}: ${failing.map((s) => s.name).join(", ")}`;
+    worst === "up" ? okLabel : `${incidentLabel}: ${failing.map((s) => s.name).join(", ")}`;
 
-  const missing = services.some((s) => s.days.some((d) => d.status === "nodata"));
-  const note = missing
-    ? `<p class="note">Grey segments are days with no monitoring data — the checks were not running, so uptime is unknown for that period rather than assumed good.</p>`
-    : "";
+  const note = nodataNote(services.flatMap((s) => s.days));
 
   return layout({
     title: "NoMercy Status",
     body: `${topbar("index")}
 ${hero ? `<div class="hero">${hero}</div>` : ""}
-<div class="banner${bannerClass}" data-overall-banner>${escapeHtml(bannerText)}</div>
+<div class="banner${bannerClass}" data-overall-banner data-label-ok="${escapeHtml(
+      okLabel
+    )}" data-label-incidents="${escapeHtml(incidentLabel)}">${escapeHtml(bannerText)}</div>
 <h1>Current status</h1>
 <div class="card-grid">
 ${services.map(card).join("\n")}
@@ -153,7 +211,6 @@ export function sparklinePath(days, width = 600, height = 90) {
 
 export function renderDetail({ service, generatedAt, repoUrl }) {
   const stats = summarise(service.days);
-  const observed = stats.uptimePct === null ? "—" : `${stats.uptimePct.toFixed(2)}%`;
   const path = sparklinePath(service.days);
 
   const windows = [
@@ -168,7 +225,9 @@ export function renderDetail({ service, generatedAt, repoUrl }) {
     body: `${topbar("detail")}
 <h1>${escapeHtml(service.name)}</h1>
 <p><a href="${escapeHtml(service.url)}">${escapeHtml(service.url)}</a> ·
-   <span class="tag ${escapeHtml(service.status)}">${escapeHtml(service.status)}</span></p>
+   <span class="tag ${escapeHtml(service.status)}" data-status-for="${escapeHtml(
+      service.slug
+    )}">${escapeHtml(service.status)}</span></p>
 
 <div class="stats">
 ${windows
@@ -185,10 +244,11 @@ ${windows
 ${renderBar(service.days)}
 <div class="bar-legend">
   <span>${service.days.length} days ago</span>
-  <span>${observed} uptime observed</span>
+  <span>${escapeHtml(uptimeLabel(stats))}</span>
   <span>Today</span>
 </div>
 ${legend()}
+${nodataNote(service.days)}
 
 <h2>Response time</h2>
 ${
@@ -207,4 +267,4 @@ ${
   });
 }
 
-export { layout, topbar, legend };
+export { layout, topbar, legend, nodataNote };
