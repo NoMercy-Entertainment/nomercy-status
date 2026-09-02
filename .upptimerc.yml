@@ -1,52 +1,129 @@
 owner: NoMercy-Entertainment
 repo: nomercy-status
 
+# Workflows are GENERATED from this file by `upptime update-template`.
+# Never hand-edit .github/workflows/*.yml — change the config here instead.
+# The self-hosted fleet is declared as a string because Upptime interpolates
+# this value straight into `runs-on:`, so it has to carry its own YAML syntax.
+runner: "[self-hosted, Linux, X64, beast-unit]"
+
 sites:
+  # The marketing site, the API and the CDN all sit behind the same Cloudflare
+  # front door, and a bare GET on the apex of each returns the byte-identical
+  # page. Every check below therefore targets something only that service can
+  # serve, so a green row means that service is genuinely alive.
   - name: Website
     url: https://nomercy.tv
-    icon: https://nomercy.tv/favicon.ico
+    icon: https://cdn.nomercy.tv/logo.png
+    expectedStatusCodes: [200]
+    maxResponseTime: 2500
+    __dangerous__body_down_if_text_missing: "Your media, your server, your rules"
 
+  # /v1/server is a real API route behind the auth guard: a 302 to /login proves
+  # the API router is alive. Redirect following is disabled so we assert the 302
+  # itself — following it would land on the login page and tell us nothing.
+  # A broken app falls through to the Laravel 404 catch-all, which fails this.
   - name: API
-    url: https://api.nomercy.tv
-    icon: https://nomercy.tv/favicon.ico
+    url: https://api.nomercy.tv/v1/server
+    icon: https://cdn.nomercy.tv/logo.png
+    expectedStatusCodes: [302]
+    maxRedirects: 0
+    maxResponseTime: 2000
 
-  - name: CDN
-    url: https://cdn.nomercy.tv
-    icon: https://nomercy.tv/favicon.ico
+  - name: App
+    url: https://app.nomercy.tv
+    icon: https://cdn.nomercy.tv/logo.png
+    expectedStatusCodes: [200]
+    maxResponseTime: 2000
+    __dangerous__body_down_if_text_missing: "NoMercy TV"
 
+  # Keycloak's realm document. The apex only 302s to the admin console, which
+  # stays up even when the realm itself cannot be served.
   - name: Authentication
-    url: https://auth.nomercy.tv
-    icon: https://nomercy.tv/favicon.ico
+    url: https://auth.nomercy.tv/realms/master
+    icon: https://cdn.nomercy.tv/logo.png
+    expectedStatusCodes: [200]
+    maxResponseTime: 1500
+    __dangerous__body_down_if_text_missing: '"realm":"master"'
+
+  # A real asset from the CDN origin. robots.txt is deliberately NOT used: it is
+  # Cloudflare Managed Content, edge-cached for a year, so it stays 200 even if
+  # the origin is dead. When the CDN cannot serve an object it returns the HTML
+  # catch-all, so a DOCTYPE in the body of what should be a PNG means breakage.
+  - name: CDN
+    url: https://cdn.nomercy.tv/logo.png
+    icon: https://cdn.nomercy.tv/logo.png
+    expectedStatusCodes: [200]
+    maxResponseTime: 1500
+    __dangerous__body_down: "<!DOCTYPE html>"
+
+  - name: Docs
+    url: https://docs.nomercy.tv
+    icon: https://cdn.nomercy.tv/logo.png
+    expectedStatusCodes: [200]
+    maxResponseTime: 2000
+    __dangerous__body_down_if_text_missing: "NoMercy Documentation"
+
+  - name: Packages
+    url: https://repo.nomercy.tv
+    icon: https://cdn.nomercy.tv/logo.png
+    expectedStatusCodes: [200]
+    maxResponseTime: 2000
+    __dangerous__body_down_if_text_missing: "NoMercy Entertainment Repository"
 
 status-website:
   cname: status.nomercy.tv
   name: NoMercy Status
   theme: dark
-  logoUrl: https://nomercy.tv/favicon.ico
-  faviconUrl: https://nomercy.tv/favicon.ico
+  # nomercy.tv/favicon.ico returns 200 with a zero-byte body, so the old logo
+  # and favicon were both broken. logo.png is a real 406x406 asset.
+  logoUrl: https://cdn.nomercy.tv/logo.png
+  faviconUrl: https://cdn.nomercy.tv/logo.png
   navbar:
     - title: Homepage
       href: https://nomercy.tv
+  # Palette below is the NoMercy design system (Moooom), dark scheme, taken
+  # verbatim from nomercy-app-web/src/components/nm/tokens.css. Step numbers are
+  # the Radix scale positions those tokens are built on: 1-3 surfaces, 6 borders,
+  # 9 solid fills, 11 accessible text, 12 high-contrast text. Status tags use the
+  # surface+text pairing rather than a solid fill because white on grass-9 is
+  # only 3.0:1; grass-11 on grass-3 is ~7.8:1. The solid step-9 colours stay on
+  # the article left-borders, which is what carries status at a glance.
+  # !important is load-bearing here — it overrides the Sapper theme's own CSS.
   css: |
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     :root {
-      --bg-primary: #0f1117;
-      --bg-panel: #1a1d26;
-      --border-color: #2a2d3a;
-      --accent: #6c63ff;
-      --accent-light: #9f9bff;
-      --text-primary: #e0e0e0;
-      --text-secondary: #888;
-      --text-heading: #fff;
-      --green: #22c55e;
-      --green-muted: #16a34a;
-      --up-border-left-color: #22c55e;
-      --up-color-color: #22c55e;
-      --tag-up-background-color: #16a34a;
-      --down-border-left-color: #ef4444;
-      --tag-down-background-color: #ef4444;
-      --degraded-border-left-color: #f59e0b;
-      --tag-degraded-background-color: #f59e0b;
+      --bg-primary: #111113;
+      --bg-panel: #18191b;
+      --bg-raised: #212225;
+      --border-color: #363a3f;
+      --text-primary: #edeef0;
+      --text-secondary: #b0b4ba;
+      --text-heading: #edeef0;
+
+      --accent: #12a594;
+      --accent-hover: #0eb39e;
+      --accent-light: #0bd8b6;
+
+      --up-solid: #46a758;
+      --up-surface: #1b2a1e;
+      --up-text: #71d083;
+      --degraded-solid: #ffc53d;
+      --degraded-surface: #302008;
+      --degraded-text: #ffca16;
+      --down-solid: #e5484d;
+      --down-surface: #3b1219;
+      --down-text: #ff9592;
+
+      --green: var(--up-solid);
+      --green-muted: var(--up-surface);
+      --up-border-left-color: var(--up-solid);
+      --up-color-color: var(--up-text);
+      --tag-up-background-color: var(--up-surface);
+      --down-border-left-color: var(--down-solid);
+      --tag-down-background-color: var(--down-surface);
+      --degraded-border-left-color: var(--degraded-solid);
+      --tag-degraded-background-color: var(--degraded-surface);
     }
     * { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
     body { background: var(--bg-primary) !important; color: var(--text-primary) !important; }
@@ -57,25 +134,25 @@ status-website:
     a:hover { color: var(--accent-light) !important; }
     nav a, .navbar a { color: var(--accent-light) !important; }
     article { background: var(--bg-panel) !important; border: 1px solid var(--border-color) !important; border-radius: 8px !important; box-shadow: none !important; }
-    article.up { border-left: 3px solid var(--green) !important; }
-    article.down { border-left: 3px solid #ef4444 !important; }
-    article.degraded { border-left: 3px solid #f59e0b !important; }
-    article h4 a { color: #fff !important; }
+    article.up { border-left: 3px solid var(--up-solid) !important; }
+    article.down { border-left: 3px solid var(--down-solid) !important; }
+    article.degraded { border-left: 3px solid var(--degraded-solid) !important; }
+    article h4 a { color: var(--text-heading) !important; }
     article h4 a:hover { color: var(--accent-light) !important; }
-    .tag.up, .tag.closed { background: var(--green-muted) !important; color: #fff !important; }
-    .tag.down, .tag.open { background: #ef4444 !important; color: #fff !important; }
-    .tag.degraded { background: #f59e0b !important; color: #fff !important; }
+    .tag.up, .tag.closed { background: var(--up-surface) !important; color: var(--up-text) !important; }
+    .tag.down, .tag.open { background: var(--down-surface) !important; color: var(--down-text) !important; }
+    .tag.degraded { background: var(--degraded-surface) !important; color: var(--degraded-text) !important; }
     .card, .shadow, [class*="shadow"] { background: var(--bg-panel) !important; border: 1px solid var(--border-color) !important; border-radius: 8px !important; box-shadow: none !important; }
-    .badge-success, .badge-up { background: var(--green-muted) !important; }
-    .badge-danger, .badge-down { background: #ef4444 !important; }
+    .badge-success, .badge-up { background: var(--up-surface) !important; color: var(--up-text) !important; }
+    .badge-danger, .badge-down { background: var(--down-surface) !important; color: var(--down-text) !important; }
     footer { background: var(--bg-panel) !important; border-top: 1px solid var(--border-color) !important; }
     footer a { color: var(--accent-light) !important; }
     .text-muted { color: var(--text-secondary) !important; }
-    .data { background: rgba(255, 255, 255, 0.06) !important; color: #ccc !important; }
-    .status-up { color: var(--green) !important; }
-    .status-down { color: #ef4444 !important; }
+    .data { background: var(--bg-raised) !important; color: var(--text-secondary) !important; }
+    .status-up { color: var(--up-text) !important; }
+    .status-down { color: var(--down-text) !important; }
     .btn-primary, .btn-outline-primary { background: var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; border-radius: 6px !important; }
-    .btn-primary:hover, .btn-outline-primary:hover { background: var(--accent-light) !important; }
+    .btn-primary:hover, .btn-outline-primary:hover { background: var(--accent-hover) !important; border-color: var(--accent-hover) !important; }
 
 i18n:
   activeIncidents: Ongoing Incidents
@@ -88,9 +165,18 @@ workflowSchedule:
   staticSite: "0 1 * * *"
   summary: "0 0 * * *"
   updateTemplate: "0 0 * * *"
-  updates: "*/5 * * * *"
+  # `uptime` is the monitoring loop; `updates` is the dependency-bump workflow.
+  # These were previously conflated under `updates`, which worked only because
+  # Uptime CI fell back to a default of the same value — and which would have
+  # run Updates CI every five minutes once its workflow was regenerated.
+  uptime: "*/5 * * * *"
+  updates: "0 3 * * *"
 
 commitMessages:
-  statusChange: "🔔 $SITE_NAME is $STATUS ($RESPONSE_CODE in $RESPONSE_TIME ms)"
-  graphsUpdate: "📊 Update graphs"
-  summaryUpdate: "📊 Update summary"
+  # $PREFIX is required. Upptime reads a site's current status back from the
+  # leading emoji of this commit, matching it against commitPrefixStatusUp (🟩).
+  # A literal emoji here never matches, so every service reads as "down"
+  # regardless of its real state. [skip ci] keeps bot commits from re-triggering.
+  statusChange: "$PREFIX $SITE_NAME is $STATUS ($RESPONSE_CODE in $RESPONSE_TIME ms) [skip ci] [upptime]"
+  graphsUpdate: "📊 Update graphs [skip ci] [upptime]"
+  summaryUpdate: "📊 Update summary [skip ci] [upptime]"
