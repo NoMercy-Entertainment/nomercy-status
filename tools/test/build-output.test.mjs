@@ -38,10 +38,32 @@ test("the 77-day CI outage renders as nodata, not as uptime", () => {
   assert.equal(midOutage.status, "nodata");
 });
 
-test("a missing hero is not fatal", () => {
+test("a missing heroes directory is not fatal", () => {
   const outDir = out();
-  buildSite({ outDir, endDate: new Date("2026-09-02T12:00:00Z"), dayCount: 90, heroPath: "does-not-exist.svg" });
-  assert.ok(readFileSync(join(outDir, "index.html"), "utf8").includes("card-grid"));
+  buildSite({ outDir, endDate: new Date("2026-09-02T12:00:00Z"), dayCount: 90, heroesDir: "does-not-exist" });
+  const html = readFileSync(join(outDir, "index.html"), "utf8");
+  assert.ok(html.includes("card-grid"));
+  assert.doesNotMatch(html, /class="hero"/);
+});
+
+test("all five heroes ship and one is revealed at random", () => {
+  const outDir = out();
+  buildSite({ outDir, endDate: new Date("2026-09-02T12:00:00Z"), dayCount: 90 });
+  const html = readFileSync(join(outDir, "index.html"), "utf8");
+
+  const slots = html.match(/<div class="hero-art"[^>]*>/g) || [];
+  assert.equal(slots.length, 5, "expected all five candidates inlined");
+  assert.equal(
+    slots.filter((slot) => !slot.includes("hidden")).length,
+    1,
+    "exactly one must be visible before the script runs"
+  );
+  assert.match(html, /data-hero-rotator/);
+  assert.match(html, /Math\.random/);
+  // Every candidate must be theme-adaptive; a literal colour would render one
+  // theme's artwork on the other theme's ground.
+  const heroMarkup = html.slice(html.indexOf('class="hero"'), html.indexOf("data-overall-banner"));
+  assert.doesNotMatch(heroMarkup, /#[0-9a-fA-F]{3,8}\b/);
 });
 
 test("two builds produce byte-identical output", () => {

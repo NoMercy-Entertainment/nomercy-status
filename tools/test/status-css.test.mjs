@@ -16,7 +16,7 @@ const service = {
 };
 
 const indexOpts = {
-  services: [service], generatedAt: new Date("2026-09-02T02:00:00Z"), hero: "",
+  services: [service], generatedAt: new Date("2026-09-02T02:00:00Z"), heroes: [],
   repoUrl: "https://github.com/NoMercy-Entertainment/nomercy-status",
   i18n: { allSystemsOperational: "All systems operational", activeIncidents: "Ongoing Incidents" },
 };

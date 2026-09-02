@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readObservations } from "./lib/parse-history.mjs";
@@ -14,9 +14,9 @@ export function buildSite({
   outDir = join(HERE, "..", "assets"),
   endDate = new Date(),
   dayCount = 90,
-  // Source, not output: `assets/` is regenerated build output, so an illustration
+  // Source, not output: `assets/` is regenerated build output, so illustrations
   // parked there would be lost the first time someone wiped it and rebuilt.
-  heroPath = join(HERE, "assets", "hero.svg"),
+  heroesDir = join(HERE, "assets", "heroes"),
 } = {}) {
   const summary = JSON.parse(readFileSync(join(cwd, "history", "summary.json"), "utf8"));
 
@@ -41,8 +41,15 @@ export function buildSite({
 
   const generatedAt = newestObservedAt ?? endDate;
 
-  // The illustration is chosen after the build exists, so treat it as optional.
-  const hero = existsSync(heroPath) ? readFileSync(heroPath, "utf8") : "";
+  // Every candidate ships; the page reveals one at random per load. Sorted so the
+  // build stays byte-identical across runs regardless of directory order, and
+  // optional so the site still builds before any illustration exists.
+  const heroes = existsSync(heroesDir)
+    ? readdirSync(heroesDir)
+        .filter((name) => name.endsWith(".svg"))
+        .sort()
+        .map((name) => readFileSync(join(heroesDir, name), "utf8").trim())
+    : [];
 
   const i18n = { allSystemsOperational: "All systems operational", activeIncidents: "Ongoing Incidents" };
   const written = [];
@@ -54,7 +61,7 @@ export function buildSite({
     written.push(relativePath);
   };
 
-  write("index.html", renderIndex({ services, generatedAt, hero, repoUrl: REPO_URL, i18n }));
+  write("index.html", renderIndex({ services, generatedAt, heroes, repoUrl: REPO_URL, i18n }));
 
   for (const service of services) {
     write(

@@ -151,7 +151,39 @@ function card(service) {
 </div>`;
 }
 
-export function renderIndex({ services, generatedAt, hero, repoUrl, i18n }) {
+/**
+ * Every candidate hero ships inline and one is revealed at random per load.
+ *
+ * Two constraints shape this. The build must stay byte-identical across runs
+ * (the daily job commits only when the output changed), so the randomness has
+ * to live in the browser, not here. And the swap must happen before first
+ * paint, or the reader sees the default hero flash and change under them --
+ * hence a synchronous inline script rather than the deferred module.
+ *
+ * With scripting unavailable the first hero simply stands.
+ */
+function heroBlock(heroes) {
+  if (!heroes?.length) return "";
+
+  const slots = heroes
+    .map((svg, index) => `  <div class="hero-art"${index === 0 ? "" : " hidden"}>${svg}</div>`)
+    .join("\n");
+
+  if (heroes.length < 2) return `<div class="hero">\n${slots}\n</div>`;
+
+  return `<div class="hero" data-hero-rotator>
+${slots}
+</div>
+<script>
+(function () {
+  var slots = document.currentScript.previousElementSibling.children;
+  var pick = Math.floor(Math.random() * slots.length);
+  for (var i = 0; i < slots.length; i++) slots[i].hidden = i !== pick;
+})();
+</script>`;
+}
+
+export function renderIndex({ services, generatedAt, heroes, repoUrl, i18n }) {
   const worst = overallStatus(services);
   const failing = services.filter((s) => normaliseStatus(s.status) !== "up");
   const bannerClass = worst === "up" ? "" : worst === "down" ? " is-down" : " is-degraded";
@@ -165,7 +197,7 @@ export function renderIndex({ services, generatedAt, hero, repoUrl, i18n }) {
   return layout({
     title: "NoMercy Status",
     body: `${topbar("index")}
-${hero ? `<div class="hero">${hero}</div>` : ""}
+${heroBlock(heroes)}
 <div class="banner${bannerClass}" data-overall-banner data-label-ok="${escapeHtml(
       okLabel
     )}" data-label-incidents="${escapeHtml(incidentLabel)}">${escapeHtml(bannerText)}</div>

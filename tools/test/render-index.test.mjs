@@ -23,7 +23,7 @@ const service = (over = {}) => ({
 const bannerOf = (html) => html.match(/<div class="banner[^"]*"[^>]*>([\s\S]*?)<\/div>/)[1];
 
 const opts = (services) => ({
-  services, generatedAt: new Date("2026-09-02T02:00:00Z"), hero: "",
+  services, generatedAt: new Date("2026-09-02T02:00:00Z"), heroes: [],
   repoUrl: "https://github.com/NoMercy-Entertainment/nomercy-status",
   i18n: { allSystemsOperational: "All systems operational", activeIncidents: "Ongoing Incidents" },
 });
@@ -155,4 +155,48 @@ test("renderBar HTML-escapes day.status in the class attribute", () => {
   const html = renderBar(malicious);
   assert.ok(!html.includes('"><b>x</b>'));
   assert.ok(html.includes(escapeHtml('"><b>x</b>')));
+});
+
+// --- hero rotation -----------------------------------------------------------
+// All candidate heroes ship in the page and one is revealed at random per load.
+// Rendering must stay deterministic (the build is asserted byte-identical
+// elsewhere), so the randomness lives entirely in the browser.
+
+const HEROES = ['<svg id="a"></svg>', '<svg id="b"></svg>', '<svg id="c"></svg>'];
+
+test("every hero is inlined so the choice needs no extra request", () => {
+  const html = renderIndex({ ...opts([service()]), heroes: HEROES });
+  for (const svg of HEROES) assert.ok(html.includes(svg), `missing hero: ${svg}`);
+});
+
+test("exactly one hero is visible before any script runs", () => {
+  const html = renderIndex({ ...opts([service()]), heroes: HEROES });
+  const slots = html.match(/<div class="hero-art"[^>]*>/g) || [];
+  assert.equal(slots.length, 3);
+  assert.equal(slots.filter((s) => !s.includes("hidden")).length, 1);
+});
+
+test("rendering is deterministic - no randomness at build time", () => {
+  // Two renders must match, or the daily rebuild would commit on every run.
+  const a = renderIndex({ ...opts([service()]), heroes: HEROES });
+  const b = renderIndex({ ...opts([service()]), heroes: HEROES });
+  assert.equal(a, b);
+});
+
+test("the rotator script ships with the page", () => {
+  const html = renderIndex({ ...opts([service()]), heroes: HEROES });
+  assert.match(html, /data-hero-rotator/);
+  assert.match(html, /Math\.random/);
+});
+
+test("a single hero renders without a rotator", () => {
+  const html = renderIndex({ ...opts([service()]), heroes: [HEROES[0]] });
+  assert.ok(html.includes(HEROES[0]));
+  assert.doesNotMatch(html, /Math\.random/);
+});
+
+test("no heroes renders no hero block at all", () => {
+  const html = renderIndex({ ...opts([service()]), heroes: [] });
+  assert.doesNotMatch(html, /class="hero"/);
+  assert.doesNotMatch(html, /Math\.random/);
 });
