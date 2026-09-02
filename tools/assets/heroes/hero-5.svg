@@ -1,0 +1,76 @@
+<svg viewBox="0 0 960 220" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Five round characters passing media between them in a relay, ending at a screen" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Playful mascots. Thick, even strokes and a single body shape repeated at
+       different scales; the personality comes from the tilt of each character
+       and where its eyes point, not from added detail. -->
+
+  <!-- ground -->
+  <path d="M52 194 H908" opacity="0.35" />
+
+  <!-- handoff arcs, drawn first so the characters sit on top -->
+  <g stroke="var(--accent)" stroke-width="2.6" opacity="0.7">
+    <path d="M176 96 C 216 62, 252 62, 292 96" />
+    <path d="M356 96 C 396 62, 432 62, 472 96" />
+    <path d="M536 96 C 576 62, 612 62, 652 96" />
+  </g>
+
+  <!-- character 1: holding a film reel -->
+  <g>
+    <path d="M104 194 a44 44 0 1 1 88 0 Z" fill="currentColor" fill-opacity="0.07" />
+    <circle cx="132" cy="152" r="5.5" fill="currentColor" stroke="none" />
+    <circle cx="164" cy="152" r="5.5" fill="currentColor" stroke="none" />
+    <path d="M138 170 a12 9 0 0 0 20 0" />
+    <!-- reel held aloft -->
+    <circle cx="176" cy="96" r="20" stroke="var(--accent)" />
+    <circle cx="176" cy="96" r="6" stroke="var(--accent)" />
+    <path d="M170 132 L176 116" />
+  </g>
+
+  <!-- character 2 -->
+  <g>
+    <path d="M284 194 a44 44 0 1 1 88 0 Z" fill="currentColor" fill-opacity="0.07" />
+    <circle cx="312" cy="152" r="5.5" fill="currentColor" stroke="none" />
+    <circle cx="344" cy="152" r="5.5" fill="currentColor" stroke="none" />
+    <path d="M318 170 a12 9 0 0 0 20 0" />
+    <path d="M292 132 L292 116" />
+    <path d="M356 132 L360 118" />
+  </g>
+
+  <!-- character 3: smaller, on tiptoe, passing a disc -->
+  <g>
+    <path d="M472 194 a36 36 0 1 1 72 0 Z" fill="currentColor" fill-opacity="0.07" />
+    <circle cx="494" cy="162" r="4.6" fill="currentColor" stroke="none" />
+    <circle cx="522" cy="162" r="4.6" fill="currentColor" stroke="none" />
+    <path d="M500 178 a10 8 0 0 0 16 0" />
+    <circle cx="536" cy="96" r="17" stroke="var(--accent)" />
+    <circle cx="536" cy="96" r="5" stroke="var(--accent)" />
+    <path d="M530 142 L534 114" />
+  </g>
+
+  <!-- character 4 -->
+  <g>
+    <path d="M648 194 a44 44 0 1 1 88 0 Z" fill="currentColor" fill-opacity="0.07" />
+    <circle cx="676" cy="152" r="5.5" fill="currentColor" stroke="none" />
+    <circle cx="708" cy="152" r="5.5" fill="currentColor" stroke="none" />
+    <path d="M682 170 a12 9 0 0 0 20 0" />
+    <path d="M652 132 L648 118" />
+    <path d="M732 130 L748 122" />
+  </g>
+
+  <!-- the screen they are feeding -->
+  <g>
+    <rect x="782" y="86" width="132" height="90" rx="12" />
+    <path d="M834 116 L862 131 L834 146 Z" fill="var(--accent)" stroke="none" />
+    <path d="M848 176 v18" opacity="0.6" />
+    <path d="M818 194 H878" opacity="0.6" />
+    <!-- it is receiving something -->
+    <g stroke="var(--accent)" stroke-width="2.6" opacity="0.75">
+      <path d="M756 110 C 768 102, 776 100, 784 100" />
+    </g>
+  </g>
+
+  <!-- a dropped disc, because someone always fumbles one -->
+  <g opacity="0.4">
+    <ellipse cx="232" cy="188" rx="18" ry="6" />
+    <ellipse cx="232" cy="188" rx="5" ry="2" />
+  </g>
+</svg>

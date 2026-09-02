@@ -1,0 +1,83 @@
+<svg viewBox="0 0 960 220" preserveAspectRatio="xMidYMid meet" role="img" aria-label="An isometric server rack with drives and patch cables feeding a display" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Isometric rack. Solids carry the form, so fills use currentColor at low
+       opacity rather than any literal colour; accent marks the live units. -->
+
+  <!-- floor plane -->
+  <g opacity="0.18">
+    <path d="M120 196 L470 106 L840 196 L470 200 Z" />
+  </g>
+
+  <!-- rack body: front-left face, front-right face, top -->
+  <g>
+    <!-- top -->
+    <path d="M470 24 L618 66 L470 108 L322 66 Z" fill="currentColor" fill-opacity="0.07" />
+    <!-- left face -->
+    <path d="M322 66 L470 108 L470 186 L322 144 Z" fill="currentColor" fill-opacity="0.12" />
+    <!-- right face -->
+    <path d="M618 66 L470 108 L470 186 L618 144 Z" fill="currentColor" fill-opacity="0.05" />
+  </g>
+
+  <!-- rack units, left face -->
+  <g opacity="0.75">
+    <path d="M334 78 L458 113" /><path d="M334 92 L458 127" />
+    <path d="M334 106 L458 141" /><path d="M334 120 L458 155" />
+  </g>
+  <!-- drive lights on the left face -->
+  <g stroke="none" fill="var(--accent)">
+    <circle cx="346" cy="84" r="3.4" /><circle cx="346" cy="98" r="3.4" />
+    <circle cx="346" cy="112" r="3.4" opacity="0.45" /><circle cx="346" cy="126" r="3.4" />
+  </g>
+
+  <!-- rack units, right face -->
+  <g opacity="0.45">
+    <path d="M606 78 L482 113" /><path d="M606 92 L482 127" />
+    <path d="M606 106 L482 141" /><path d="M606 120 L482 155" />
+  </g>
+
+  <!-- a drive pulled halfway out -->
+  <g>
+    <path d="M300 96 L358 113 L358 129 L300 112 Z" fill="currentColor" fill-opacity="0.16" />
+    <path d="M300 96 L318 90 L376 107 L358 113 Z" fill="currentColor" fill-opacity="0.09" />
+    <path d="M376 107 L376 123 L358 129" />
+    <circle cx="312" cy="106" r="3.2" stroke="none" fill="var(--accent)" />
+  </g>
+
+  <!-- patch cables arcing to the display -->
+  <g stroke="var(--accent)" opacity="0.8">
+    <path d="M618 82 C 690 74, 706 92, 740 100" />
+  </g>
+  <g opacity="0.4">
+    <path d="M618 96 C 694 90, 704 112, 738 120" />
+    <path d="M618 110 C 690 108, 700 130, 736 138" />
+  </g>
+
+  <!-- display, isometric -->
+  <g>
+    <path d="M742 62 L862 96 L862 160 L742 126 Z" fill="currentColor" fill-opacity="0.1" />
+    <path d="M742 62 L760 56 L880 90 L862 96 Z" fill="currentColor" fill-opacity="0.05" />
+    <path d="M880 90 L880 154 L862 160" />
+    <path d="M790 96 L822 114 L790 122 Z" fill="var(--accent)" stroke="none" />
+    <path d="M802 158 L802 182" opacity="0.5" />
+    <path d="M778 186 L826 186" opacity="0.5" />
+  </g>
+
+  <!-- technician, isometric, beside the rack -->
+  <g>
+    <circle cx="228" cy="120" r="9" />
+    <path d="M216 116 a12 12 0 0 1 24 0" />
+    <path d="M212 116 h32" />
+    <path d="M228 129 v22" />
+    <path d="M228 134 l22 -8" />
+    <path d="M228 151 l-10 14 M228 151 l10 12" />
+  </g>
+
+  <!-- a stack of spare drives -->
+  <g opacity="0.55">
+    <path d="M110 168 L152 180 L152 190 L110 178 Z" fill="currentColor" fill-opacity="0.12" />
+    <path d="M110 168 L124 164 L166 176 L152 180 Z" fill="currentColor" fill-opacity="0.07" />
+    <path d="M166 176 L166 186 L152 190" />
+    <path d="M110 154 L152 166 L152 176 L110 164 Z" fill="currentColor" fill-opacity="0.12" />
+    <path d="M110 154 L124 150 L166 162 L152 166 Z" fill="currentColor" fill-opacity="0.07" />
+    <path d="M166 162 L166 172 L152 176" />
+  </g>
+</svg>

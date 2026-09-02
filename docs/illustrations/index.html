@@ -1,0 +1,482 @@
+<title>Status Page Heroes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  /* Page chrome. Light palette on bare :root; dark redefines tokens only. */
+  :root {
+    --bg:      #f4f4f6;
+    --panel:   #fcfcfd;
+    --line:    #dcdce1;
+    --ink:     #1a1d21;
+    --dim:     #5c6067;
+    --brand:   #0d7d6f;
+    --shadow:  0 1px 2px rgba(16, 20, 24, .06), 0 8px 24px -12px rgba(16, 20, 24, .18);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:     #0d0e10;
+      --panel:  #17181b;
+      --line:   #2c2f34;
+      --ink:    #eceef0;
+      --dim:    #9fa4ab;
+      --brand:  #14c7b1;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:     #0d0e10;
+    --panel:  #17181b;
+    --line:   #2c2f34;
+    --ink:    #eceef0;
+    --dim:    #9fa4ab;
+    --brand:  #14c7b1;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell { max-width: 1120px; margin: 0 auto; padding: 40px 24px 96px; }
+
+  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  h1 {
+    font-size: clamp(26px, 3.4vw, 36px);
+    font-weight: 600; letter-spacing: -0.022em;
+    margin: 0 0 8px; text-wrap: balance;
+  }
+  .lede { margin: 0; max-width: 62ch; color: var(--dim); font-size: 15px; }
+  .lede strong { color: var(--ink); font-weight: 500; }
+
+  .toggle {
+    font: 500 13px/1 "IBM Plex Mono", ui-monospace, monospace;
+    color: var(--ink); background: var(--panel);
+    border: 1px solid var(--line); border-radius: 7px;
+    padding: 9px 14px; cursor: pointer; white-space: nowrap;
+  }
+  .toggle:hover { border-color: var(--brand); color: var(--brand); }
+  .toggle:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+  .rule { height: 1px; background: var(--line); margin: 32px 0 8px; border: 0; }
+
+  .card { margin-top: 40px; }
+
+  .head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
+  .num {
+    font: 500 12px/1 "IBM Plex Mono", ui-monospace, monospace;
+    color: var(--brand); letter-spacing: .1em;
+    border: 1px solid var(--line); border-radius: 5px; padding: 5px 8px;
+  }
+  h2 { font-size: 19px; font-weight: 600; letter-spacing: -0.012em; margin: 0; }
+  .file { font: 400 12px/1 "IBM Plex Mono", ui-monospace, monospace; color: var(--dim); margin-left: auto; }
+  .why { margin: 0 0 16px; color: var(--dim); font-size: 14.5px; max-width: 74ch; }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 860px) { .pair { grid-template-columns: 1fr; } }
+
+  .stage {
+    border: 1px solid var(--line); border-radius: 12px;
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  .stage figcaption {
+    font: 500 11px/1 "IBM Plex Mono", ui-monospace, monospace;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 9px 12px; border-bottom: 1px solid;
+  }
+  .stage .art { display: block; width: 100%; height: auto; padding: 6px 10px 10px; }
+
+  /* The two grounds are the status page's real tokens, so what you judge here
+     is what ships. They are fixed per stage and do not follow the page theme. */
+  .stage.on-dark  { --accent: #12a594; background: #111113; color: #edeef0; }
+  .stage.on-dark  figcaption { border-color: #2a2d33; color: #9aa0a6; }
+  .stage.on-light { --accent: #0d9b8a; background: #f9f9fb; color: #1c2024; }
+  .stage.on-light figcaption { border-color: #e2e2e7; color: #6b7078; }
+
+  footer {
+    margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line);
+    color: var(--dim); font-size: 14px; max-width: 74ch;
+  }
+  footer code {
+    font: 400 13px/1.4 "IBM Plex Mono", ui-monospace, monospace;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 5px; padding: 2px 6px;
+  }
+  footer p { margin: 0 0 10px; }
+</style>
+
+<!-- Definitions. Each hero is declared once and placed twice via <use>, so the
+     two grounds cannot drift apart and the gradient id stays unique. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="var(--accent)" stop-opacity="0.42" />
+      <stop offset="1" stop-color="var(--accent)" stop-opacity="0.04" />
+    </linearGradient>
+  </defs>
+
+  <symbol id="hero-1" viewBox="0 0 960 220">
+    <g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <g opacity="0.28">
+        <path d="M60 44 H352 a14 14 0 0 1 14 14 V72" />
+        <path d="M420 30 H700 a14 14 0 0 1 14 14 V58" />
+        <path d="M120 44 v-14" /><path d="M240 44 v-14" />
+        <path d="M520 30 v-12" /><path d="M640 30 v-12" />
+        <circle cx="366" cy="58" r="5" /><circle cx="714" cy="44" r="5" />
+      </g>
+      <path d="M36 186 H924" opacity="0.45" />
+      <circle cx="128" cy="112" r="46" />
+      <circle cx="128" cy="112" r="13" />
+      <g opacity="0.55">
+        <circle cx="128" cy="82" r="8" /><circle cx="156" cy="102" r="8" />
+        <circle cx="145" cy="136" r="8" /><circle cx="111" cy="136" r="8" />
+        <circle cx="100" cy="102" r="8" />
+      </g>
+      <path d="M128 158 L104 186 M128 158 L152 186" />
+      <path d="M96 186 H160" />
+      <path d="M174 112 C 220 112, 236 106, 268 106 S 316 118, 344 118" stroke="var(--accent)" />
+      <g opacity="0.5">
+        <path d="M196 102 v8 M222 100 v8 M248 99 v8 M274 102 v8 M300 108 v8 M326 114 v8" />
+      </g>
+      <rect x="344" y="72" width="192" height="114" rx="10" />
+      <circle cx="382" cy="104" r="16" /><path d="M382 104 L392 95" />
+      <circle cx="424" cy="104" r="16" /><path d="M424 104 L417 93" />
+      <rect x="366" y="140" width="148" height="26" rx="5" opacity="0.55" />
+      <path d="M378 153 h30 M418 153 h30 M458 153 h24" opacity="0.55" />
+      <path d="M470 72 V52 H616 V96" opacity="0.4" />
+      <rect x="470" y="88" width="34" height="18" rx="4" fill="var(--accent)" stroke="none" opacity="0.85" />
+      <path d="M536 168 H716" />
+      <g opacity="0.5">
+        <circle cx="556" cy="176" r="8" /><circle cx="596" cy="176" r="8" />
+        <circle cx="636" cy="176" r="8" /><circle cx="676" cy="176" r="8" />
+      </g>
+      <rect x="548" y="140" width="38" height="26" rx="3" />
+      <rect x="600" y="140" width="38" height="26" rx="3" />
+      <rect x="652" y="140" width="38" height="26" rx="3" opacity="0.5" />
+      <rect x="742" y="66" width="176" height="118" rx="12" />
+      <rect x="758" y="82" width="144" height="86" rx="6" opacity="0.4" />
+      <path d="M818 108 L848 125 L818 142 Z" fill="var(--accent)" stroke="none" />
+      <path d="M806 186 h88" opacity="0.6" />
+      <path d="M716 158 C 726 158, 734 150, 742 142" stroke="var(--accent)" opacity="0.6" />
+      <path d="M258 152 a13 13 0 0 1 26 0" />
+      <path d="M252 152 h38" />
+      <circle cx="271" cy="160" r="8" />
+      <path d="M271 168 v18" /><path d="M271 174 l14 8" />
+      <path d="M694 140 a13 13 0 0 1 26 0" />
+      <path d="M688 140 h38" />
+      <circle cx="707" cy="148" r="8" />
+      <path d="M707 156 v20" /><path d="M707 162 l-16 6" />
+      <path d="M707 176 l-8 10 M707 176 l8 10" />
+    </g>
+  </symbol>
+
+  <symbol id="hero-2" viewBox="0 0 960 220">
+    <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M120 196 L470 106 L840 196 L470 200 Z" opacity="0.18" />
+      <path d="M470 24 L618 66 L470 108 L322 66 Z" fill="currentColor" fill-opacity="0.07" />
+      <path d="M322 66 L470 108 L470 186 L322 144 Z" fill="currentColor" fill-opacity="0.12" />
+      <path d="M618 66 L470 108 L470 186 L618 144 Z" fill="currentColor" fill-opacity="0.05" />
+      <g opacity="0.75">
+        <path d="M334 78 L458 113" /><path d="M334 92 L458 127" />
+        <path d="M334 106 L458 141" /><path d="M334 120 L458 155" />
+      </g>
+      <g stroke="none" fill="var(--accent)">
+        <circle cx="346" cy="84" r="3.4" /><circle cx="346" cy="98" r="3.4" />
+        <circle cx="346" cy="112" r="3.4" opacity="0.45" /><circle cx="346" cy="126" r="3.4" />
+      </g>
+      <g opacity="0.45">
+        <path d="M606 78 L482 113" /><path d="M606 92 L482 127" />
+        <path d="M606 106 L482 141" /><path d="M606 120 L482 155" />
+      </g>
+      <path d="M300 96 L358 113 L358 129 L300 112 Z" fill="currentColor" fill-opacity="0.16" />
+      <path d="M300 96 L318 90 L376 107 L358 113 Z" fill="currentColor" fill-opacity="0.09" />
+      <path d="M376 107 L376 123 L358 129" />
+      <circle cx="312" cy="106" r="3.2" stroke="none" fill="var(--accent)" />
+      <path d="M618 82 C 690 74, 706 92, 740 100" stroke="var(--accent)" opacity="0.8" />
+      <g opacity="0.4">
+        <path d="M618 96 C 694 90, 704 112, 738 120" />
+        <path d="M618 110 C 690 108, 700 130, 736 138" />
+      </g>
+      <path d="M742 62 L862 96 L862 160 L742 126 Z" fill="currentColor" fill-opacity="0.1" />
+      <path d="M742 62 L760 56 L880 90 L862 96 Z" fill="currentColor" fill-opacity="0.05" />
+      <path d="M880 90 L880 154 L862 160" />
+      <path d="M790 96 L822 114 L790 122 Z" fill="var(--accent)" stroke="none" />
+      <path d="M802 158 L802 182" opacity="0.5" />
+      <path d="M778 186 L826 186" opacity="0.5" />
+      <circle cx="228" cy="120" r="9" />
+      <path d="M216 116 a12 12 0 0 1 24 0" />
+      <path d="M212 116 h32" />
+      <path d="M228 129 v22" /><path d="M228 134 l22 -8" />
+      <path d="M228 151 l-10 14 M228 151 l10 12" />
+      <g opacity="0.55">
+        <path d="M110 168 L152 180 L152 190 L110 178 Z" fill="currentColor" fill-opacity="0.12" />
+        <path d="M110 168 L124 164 L166 176 L152 180 Z" fill="currentColor" fill-opacity="0.07" />
+        <path d="M166 176 L166 186 L152 190" />
+        <path d="M110 154 L152 166 L152 176 L110 164 Z" fill="currentColor" fill-opacity="0.12" />
+        <path d="M110 154 L124 150 L166 162 L152 166 Z" fill="currentColor" fill-opacity="0.07" />
+        <path d="M166 162 L166 172 L152 176" />
+      </g>
+    </g>
+  </symbol>
+
+  <symbol id="hero-3" viewBox="0 0 960 220">
+    <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M60 190 H900" opacity="0.2" />
+      <path d="M104 190 L128 76 L152 190" opacity="0.7" />
+      <path d="M112 154 H144" opacity="0.5" />
+      <path d="M118 124 H138" opacity="0.5" />
+      <circle cx="128" cy="68" r="5" fill="var(--accent)" stroke="none" />
+      <g opacity="0.45" stroke="var(--accent)">
+        <path d="M112 56 a22 22 0 0 1 32 0" />
+        <path d="M100 44 a40 40 0 0 1 56 0" />
+      </g>
+      <path stroke="var(--accent)" d="M168 130 l14 -22 l14 44 l14 -52 l14 58 l14 -40 l14 30 l14 -34 l16 24 l16 -18 l16 14 l16 -10 C 384 122, 400 128, 424 128 H 556 C 588 128, 604 116, 636 116 H 700" />
+      <circle cx="424" cy="128" r="14" />
+      <circle cx="424" cy="128" r="5" fill="var(--accent)" stroke="none" />
+      <path d="M424 142 V190" opacity="0.3" />
+      <circle cx="556" cy="128" r="14" />
+      <circle cx="556" cy="128" r="5" fill="var(--accent)" stroke="none" />
+      <path d="M556 142 V190" opacity="0.3" />
+      <circle cx="636" cy="116" r="10" opacity="0.6" />
+      <path d="M636 126 V190" opacity="0.2" />
+      <g opacity="0.16">
+        <path d="M200 158 H424 M456 158 H556 M588 158 H700" />
+        <path d="M232 100 H424 M456 100 H556 M588 100 H700" />
+      </g>
+      <rect x="700" y="80" width="164" height="104" rx="10" opacity="0.8" />
+      <rect x="714" y="94" width="136" height="76" rx="5" opacity="0.3" />
+      <path d="M772 118 L800 132 L772 146 Z" fill="var(--accent)" stroke="none" />
+      <g opacity="0.55">
+        <path d="M700 200 v-10 M714 200 v-16 M728 200 v-22 M742 200 v-14 M756 200 v-20 M770 200 v-26 M784 200 v-12 M798 200 v-18 M812 200 v-24 M826 200 v-10 M840 200 v-16 M854 200 v-8" />
+      </g>
+    </g>
+  </symbol>
+
+  <symbol id="hero-4" viewBox="0 0 960 220">
+    <g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M258 96 L676 40 L676 194 L258 132 Z" fill="url(#beam)" stroke="none" />
+      <rect x="96" y="86" width="150" height="70" rx="10" />
+      <path d="M246 100 L272 92 L272 142 L246 134 Z" />
+      <circle cx="259" cy="117" r="9" opacity="0.6" />
+      <circle cx="132" cy="52" r="30" /><circle cx="132" cy="52" r="8" />
+      <g opacity="0.5">
+        <circle cx="132" cy="34" r="5" /><circle cx="149" cy="46" r="5" />
+        <circle cx="143" cy="66" r="5" /><circle cx="121" cy="66" r="5" />
+        <circle cx="115" cy="46" r="5" />
+      </g>
+      <circle cx="206" cy="56" r="22" opacity="0.75" />
+      <circle cx="206" cy="56" r="6" opacity="0.75" />
+      <path d="M160 44 C 176 36, 190 38, 200 44" opacity="0.6" />
+      <path d="M132 82 v4 M206 78 v8" opacity="0.6" />
+      <g opacity="0.45"><path d="M114 104 h26 M114 116 h26 M114 128 h26" /></g>
+      <path d="M170 156 v22" />
+      <path d="M138 196 L170 178 L202 196" />
+      <path d="M124 196 H216" opacity="0.6" />
+      <g fill="var(--accent)" stroke="none" opacity="0.7">
+        <circle cx="330" cy="104" r="2.4" /><circle cx="386" cy="140" r="1.8" />
+        <circle cx="432" cy="86" r="2.1" /><circle cx="470" cy="152" r="1.6" />
+        <circle cx="520" cy="110" r="2.6" /><circle cx="566" cy="72" r="1.9" />
+        <circle cx="604" cy="164" r="2.2" /><circle cx="642" cy="118" r="1.7" />
+        <circle cx="358" cy="168" r="1.5" /><circle cx="496" cy="60" r="1.5" />
+      </g>
+      <rect x="676" y="34" width="204" height="166" rx="6" fill="currentColor" fill-opacity="0.05" />
+      <rect x="690" y="48" width="176" height="124" rx="3" opacity="0.5" />
+      <g opacity="0.35">
+        <path d="M676 34 v166 M690 40 v154" />
+        <path d="M880 34 v166 M866 40 v154" />
+      </g>
+      <g opacity="0.55">
+        <path d="M704 138 H852" />
+        <path d="M704 138 L752 100 L788 126 L820 104 L852 130" />
+        <circle cx="812" cy="72" r="10" />
+      </g>
+      <path d="M676 200 H880" opacity="0.6" />
+    </g>
+  </symbol>
+
+  <symbol id="hero-5" viewBox="0 0 960 220">
+    <g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M52 194 H908" opacity="0.35" />
+      <g stroke="var(--accent)" stroke-width="2.6" opacity="0.7">
+        <path d="M176 96 C 216 62, 252 62, 292 96" />
+        <path d="M356 96 C 396 62, 432 62, 472 96" />
+        <path d="M536 96 C 576 62, 612 62, 652 96" />
+      </g>
+      <path d="M104 194 a44 44 0 1 1 88 0 Z" fill="currentColor" fill-opacity="0.07" />
+      <circle cx="132" cy="152" r="5.5" fill="currentColor" stroke="none" />
+      <circle cx="164" cy="152" r="5.5" fill="currentColor" stroke="none" />
+      <path d="M138 170 a12 9 0 0 0 20 0" />
+      <circle cx="176" cy="96" r="20" stroke="var(--accent)" />
+      <circle cx="176" cy="96" r="6" stroke="var(--accent)" />
+      <path d="M170 132 L176 116" />
+      <path d="M284 194 a44 44 0 1 1 88 0 Z" fill="currentColor" fill-opacity="0.07" />
+      <circle cx="312" cy="152" r="5.5" fill="currentColor" stroke="none" />
+      <circle cx="344" cy="152" r="5.5" fill="currentColor" stroke="none" />
+      <path d="M318 170 a12 9 0 0 0 20 0" />
+      <path d="M292 132 L292 116" /><path d="M356 132 L360 118" />
+      <path d="M472 194 a36 36 0 1 1 72 0 Z" fill="currentColor" fill-opacity="0.07" />
+      <circle cx="494" cy="162" r="4.6" fill="currentColor" stroke="none" />
+      <circle cx="522" cy="162" r="4.6" fill="currentColor" stroke="none" />
+      <path d="M500 178 a10 8 0 0 0 16 0" />
+      <circle cx="536" cy="96" r="17" stroke="var(--accent)" />
+      <circle cx="536" cy="96" r="5" stroke="var(--accent)" />
+      <path d="M530 142 L534 114" />
+      <path d="M648 194 a44 44 0 1 1 88 0 Z" fill="currentColor" fill-opacity="0.07" />
+      <circle cx="676" cy="152" r="5.5" fill="currentColor" stroke="none" />
+      <circle cx="708" cy="152" r="5.5" fill="currentColor" stroke="none" />
+      <path d="M682 170 a12 9 0 0 0 20 0" />
+      <path d="M652 132 L648 118" /><path d="M732 130 L748 122" />
+      <rect x="782" y="86" width="132" height="90" rx="12" />
+      <path d="M834 116 L862 131 L834 146 Z" fill="var(--accent)" stroke="none" />
+      <path d="M848 176 v18" opacity="0.6" />
+      <path d="M818 194 H878" opacity="0.6" />
+      <path d="M756 110 C 768 102, 776 100, 784 100" stroke="var(--accent)" stroke-width="2.6" opacity="0.75" />
+      <g opacity="0.4">
+        <ellipse cx="232" cy="188" rx="18" ry="6" />
+        <ellipse cx="232" cy="188" rx="5" ry="2" />
+      </g>
+    </g>
+  </symbol>
+</svg>
+
+<div class="shell">
+  <header>
+    <div>
+      <h1>Five heroes for the status page</h1>
+      <p class="lede">
+        Each one sits on the <strong>real</strong> page grounds and uses the live Moooom tokens,
+        so what you judge here is what ships. Pick a number.
+      </p>
+    </div>
+    <button class="toggle" type="button" data-toggle>Flip page theme</button>
+  </header>
+
+  <hr class="rule">
+
+  <section class="card">
+    <div class="head">
+      <span class="num">01</span>
+      <h2>Machine room</h2>
+      <span class="file">hero-1.svg</span>
+    </div>
+    <p class="why">The closest answer to GitHub's scene: engineers tending a contraption that feeds a
+      film reel through to a screen. Busiest of the five, and the only one with a story in it.</p>
+    <div class="pair">
+      <figure class="stage on-dark"><figcaption>Dark</figcaption>
+        <svg class="art" viewBox="0 0 960 220" role="img" aria-label="Machine room, dark"><use href="#hero-1"/></svg>
+      </figure>
+      <figure class="stage on-light"><figcaption>Light</figcaption>
+        <svg class="art" viewBox="0 0 960 220" role="img" aria-label="Machine room, light"><use href="#hero-1"/></svg>
+      </figure>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="head">
+      <span class="num">02</span>
+      <h2>Isometric rack</h2>
+      <span class="file">hero-2.svg</span>
+    </div>
+    <p class="why">Reads as infrastructure rather than media: a rack with a drive pulled halfway out,
+      patch cables arcing to a display. The teal drive lights are the only saturated marks.</p>
+    <div class="pair">
+      <figure class="stage on-dark"><figcaption>Dark</figcaption>
+        <svg class="art" viewBox="0 0 960 220" role="img" aria-label="Isometric rack, dark"><use href="#hero-2"/></svg>
+      </figure>
+      <figure class="stage on-light"><figcaption>Light</figcaption>
+        <svg class="art" viewBox="0 0 960 220" role="img" aria-label="Isometric rack, light"><use href="#hero-2"/></svg>
+      </figure>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="head">
+      <span class="num">03</span>
+      <h2>Signal flow</h2>
+      <span class="file">hero-3.svg</span>
+    </div>
+    <p class="why">No characters. A signal leaves the tower noisy and resolves into a clean line as it
+      passes the relays. The quietest option, and the one that will age best.</p>
+    <div class="pair">
+      <figure class="stage on-dark"><figcaption>Dark</figcaption>
+        <svg class="art" viewBox="0 0 960 220" role="img" aria-label="Signal flow, dark"><use href="#hero-3"/></svg>
+      </figure>
+      <figure class="stage on-light"><figcaption>Light</figcaption>
+        <svg class="art" viewBox="0 0 960 220" role="img" aria-label="Signal flow, light"><use href="#hero-3"/></svg>
+      </figure>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="head">
+      <span class="num">04</span>
+      <h2>Retro cinema</h2>
+      <span class="file">hero-4.svg</span>
+    </div>
+    <p class="why">A projector throwing a beam across the full width onto a screen. The beam is the only
+      large filled shape on the page, so the accent carries it and everything else stays outline.</p>
+    <div class="pair">
+      <figure class="stage on-dark"><figcaption>Dark</figcaption>
+        <svg class="art" viewBox="0 0 960 220" role="img" aria-label="Retro cinema, dark"><use href="#hero-4"/></svg>
+      </figure>
+      <figure class="stage on-light"><figcaption>Light</figcaption>
+        <svg class="art" viewBox="0 0 960 220" role="img" aria-label="Retro cinema, light"><use href="#hero-4"/></svg>
+      </figure>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="head">
+      <span class="num">05</span>
+      <h2>Mascot relay</h2>
+      <span class="file">hero-5.svg</span>
+    </div>
+    <p class="why">Round characters passing media down a line into the screen. Thickest strokes of the
+      five, and the only one that is actually trying to be funny. Someone has dropped a disc.</p>
+    <div class="pair">
+      <figure class="stage on-dark"><figcaption>Dark</figcaption>
+        <svg class="art" viewBox="0 0 960 220" role="img" aria-label="Mascot relay, dark"><use href="#hero-5"/></svg>
+      </figure>
+      <figure class="stage on-light"><figcaption>Light</figcaption>
+        <svg class="art" viewBox="0 0 960 220" role="img" aria-label="Mascot relay, light"><use href="#hero-5"/></svg>
+      </figure>
+    </div>
+  </section>
+
+  <footer>
+    <p>Tell me a number and I will copy it to <code>tools/assets/hero.svg</code>, rebuild, and push it
+      to the open pull request.</p>
+    <p>None of them is committed as the hero yet, so choosing costs nothing and changing your mind later
+      costs one line. If none of them land, say what is wrong and I will redraw rather than pick the
+      least bad one.</p>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var KEY = "nm-hero-picker-theme";
+    var stored = null;
+    try { stored = localStorage.getItem(KEY); } catch (e) { /* private mode */ }
+    if (stored === "dark" || stored === "light") root.dataset.theme = stored;
+
+    document.querySelector("[data-toggle]").addEventListener("click", function () {
+      var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      var current = root.dataset.theme || (prefersDark ? "dark" : "light");
+      var next = current === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      try { localStorage.setItem(KEY, next); } catch (e) { /* not persisted */ }
+    });
+  })();
+</script>

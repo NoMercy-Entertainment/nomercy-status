@@ -1,0 +1,62 @@
+# Hand-maintained. Upptime's update-template only rewrites its own eight
+# workflows, so this filename must never collide with them.
+name: Status Site CI
+on:
+  schedule:
+    - cron: "30 0 * * *"
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.repository }}-status-site
+  cancel-in-progress: false
+jobs:
+  build:
+    name: Rebuild status site
+    runs-on: [self-hosted, Linux, X64, beast-unit]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT || github.token }}
+      # Nothing else in this repo runs `node` directly, so the self-hosted runner is
+      # not guaranteed to have one -- and `observations.at(-1)` needs >= 16.6.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run tests
+        run: node --test tools/test/*.test.mjs
+      - name: Build
+        run: node tools/build-status-site.mjs
+      - name: Commit when changed
+        run: |
+          set -euo pipefail
+          git config user.name "Upptime Bot"
+          git config user.email "73812536+upptime-bot@users.noreply.github.com"
+          git add assets/
+          if git diff --cached --quiet; then
+            echo "no changes"
+            exit 0
+          fi
+          # No [skip ci]: this commit must trigger Static Site CI to deploy.
+          git commit -m "chore(status-site): rebuild status page"
+          # uptime.yml commits to the same branch every 5 minutes, so the
+          # push below can lose a race. Rebase onto the latest remote state
+          # and retry a bounded number of times rather than failing red.
+          branch="$(git rev-parse --abbrev-ref HEAD)"
+          max_attempts=3
+          push_ok=false
+          for attempt in $(seq 1 "$max_attempts"); do
+            if git push; then
+              push_ok=true
+              break
+            fi
+            echo "push attempt $attempt failed" >&2
+            if [ "$attempt" -lt "$max_attempts" ]; then
+              git pull --rebase origin "$branch"
+            fi
+          done
+          if [ "$push_ok" != true ]; then
+            echo "push failed after $max_attempts attempts" >&2
+            exit 1
+          fi
