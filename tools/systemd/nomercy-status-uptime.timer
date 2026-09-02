@@ -1,0 +1,22 @@
+[Unit]
+Description=Trigger a NoMercy status uptime check every five minutes
+Documentation=https://github.com/NoMercy-Entertainment/nomercy-status
+
+[Timer]
+# The cadence .upptimerc.yml already asks for, actually delivered.
+OnBootSec=2min
+OnUnitActiveSec=5min
+
+# Spread the request a little so it does not land on the same second every time,
+# and so a fleet of machines could not stampede the API together.
+RandomizedDelaySec=20s
+
+# If the machine was asleep or off, do one catch-up run rather than replaying
+# every missed tick.
+Persistent=true
+
+AccuracySec=30s
+Unit=nomercy-status-uptime.service
+
+[Install]
+WantedBy=timers.target

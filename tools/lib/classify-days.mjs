@@ -1,5 +1,6 @@
+import { rankOf } from "./status-rank.mjs";
+
 const DAY_MS = 86_400_000;
-const RANK = { up: 0, degraded: 1, down: 2 };
 
 export function utcDayKey(date) {
   return date.toISOString().slice(0, 10);
@@ -43,7 +44,7 @@ export function classifyDays(observations, endDate, dayCount, gapHours = 48) {
       let total = 0;
       let counted = 0;
       for (const observation of observed) {
-        if (RANK[observation.status] > RANK[status]) status = observation.status;
+        if (rankOf(observation.status) > rankOf(status)) status = observation.status;
         if (typeof observation.responseTimeMs === "number") {
           total += observation.responseTimeMs;
           counted++;

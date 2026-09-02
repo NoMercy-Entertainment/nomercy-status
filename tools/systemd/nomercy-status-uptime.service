@@ -1,0 +1,24 @@
+[Unit]
+Description=Trigger a NoMercy status uptime check
+Documentation=https://github.com/NoMercy-Entertainment/nomercy-status
+# Without a network the dispatch can only fail noisily; wait for one.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Holds NOMERCY_STATUS_TOKEN=... , readable only by root (chmod 600).
+EnvironmentFile=/etc/nomercy-status.env
+ExecStart=/opt/nomercy-status/tools/dispatch-uptime.sh
+
+# A missed dispatch is not worth waking anyone: the next tick is 5 minutes away
+# and GitHub's own schedule is still there as a fallback.
+SuccessExitStatus=0
+Restart=no
+
+# This only makes an outbound HTTPS request, so give it nothing else.
+DynamicUser=yes
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes

@@ -16,6 +16,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
+          # Matches the ref every Upptime-generated workflow checks out. On the
+          # schedule and dispatch triggers this resolves to the default branch
+          # anyway; it is here so the commit step pushes to the branch the run
+          # was started from rather than relying on that assumption holding.
+          ref: ${{ github.head_ref || github.ref_name }}
+          # The generator rebuilds 90 days of history by walking `git log` of each
+          # history/<slug>.yml. A shallow clone yields empty bars with no error.
           fetch-depth: 0
           token: ${{ secrets.GH_PAT || github.token }}
       # Nothing else in this repo runs `node` directly, so the self-hosted runner is

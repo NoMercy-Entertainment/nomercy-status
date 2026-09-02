@@ -1,7 +1,11 @@
 import { escapeHtml } from "./html.mjs";
 import { summarise } from "./classify-days.mjs";
+import { normaliseStatus, rankOf } from "./status-rank.mjs";
 
-const RANK = { up: 0, degraded: 1, down: 2 };
+// Re-exported so importers keep one obvious entry point, while the definition
+// itself lives in one place shared with the day classifier.
+export { normaliseStatus };
+
 
 const DAY_LABEL = {
   up: "operational",
@@ -19,19 +23,12 @@ const dayLabel = (status) => DAY_LABEL[status] ?? "unknown status";
 
 const plural = (count, noun) => `${count} ${noun}${count === 1 ? "" : "s"}`;
 
-/**
- * An unrecognised status must degrade to the WORST case, never the best: a status
- * page that quietly renders an unknown value as "up" is lying about an outage.
- */
-export function normaliseStatus(status) {
-  return status === "up" || status === "degraded" || status === "down" ? status : "down";
-}
 
 export function overallStatus(services) {
   let worst = "up";
   for (const service of services) {
     const status = normaliseStatus(service.status);
-    if (RANK[status] > RANK[worst]) worst = status;
+    if (rankOf(status) > rankOf(worst)) worst = status;
   }
   return worst;
 }
@@ -77,7 +74,7 @@ export function renderBar(days) {
     .join("")}</div>`;
 }
 
-function layout({ title, body, extraHead = "" }) {
+function layout({ title, description, body, extraHead = "" }) {
   // No `data-theme` here on purpose. Baking one in makes the stylesheet's
   // `prefers-color-scheme` branch unreachable, so light-preference readers get dark
   // with JS off and a dark->light flash with JS on. The CSS owns the default (dark);
@@ -88,6 +85,7 @@ function layout({ title, body, extraHead = "" }) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(title)}</title>
+<meta name="description" content="${escapeHtml(description)}">
 <link rel="icon" href="https://cdn.nomercy.tv/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
@@ -109,7 +107,7 @@ function topbar(active) {
   <span>
     ${active === "index" ? "" : '<a href="/">← All services</a> '}
     <a href="https://nomercy.tv">Homepage</a>
-    <button class="theme-toggle" type="button" data-theme-toggle>Theme</button>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">Theme</button>
   </span>
 </div>`;
 }
@@ -196,6 +194,7 @@ export function renderIndex({ services, generatedAt, heroes, repoUrl, i18n }) {
 
   return layout({
     title: "NoMercy Status",
+    description: `Live availability for ${services.length} NoMercy services, with 90 days of history.`,
     body: `${topbar("index")}
 ${heroBlock(heroes)}
 <div class="banner${bannerClass}" data-overall-banner data-label-ok="${escapeHtml(
@@ -254,6 +253,7 @@ export function renderDetail({ service, generatedAt, repoUrl }) {
 
   return layout({
     title: `${service.name} — NoMercy Status`,
+    description: `Availability and response time for ${service.name} over the last ${service.days.length} days.`,
     body: `${topbar("detail")}
 <h1>${escapeHtml(service.name)}</h1>
 <p><a href="${escapeHtml(service.url)}">${escapeHtml(service.url)}</a> ·
