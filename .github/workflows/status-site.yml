@@ -21,7 +21,7 @@ jobs:
       # Nothing else in this repo runs `node` directly, so the self-hosted runner is
       # not guaranteed to have one -- and `observations.at(-1)` needs >= 16.6.
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
       - name: Run tests
