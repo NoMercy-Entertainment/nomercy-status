@@ -129,10 +129,13 @@ function nodataNote(days) {
 
 function card(service) {
   const stats = summarise(service.days);
+  // summary.json's `time` is the ALL-TIME mean, not a current reading. Labelling
+  // it "Response time" invites the reader to take it as how the service is
+  // performing right now.
   const responseTime =
     service.time == null
       ? ""
-      : `\n  <p class="card-meta">Response time <b>${escapeHtml(String(service.time))} ms</b></p>`;
+      : `\n  <p class="card-meta">All-time avg <b>${escapeHtml(String(service.time))} ms</b></p>`;
   return `<div class="card">
   <div class="card-head">
     <h2><a href="/history/${escapeHtml(service.slug)}/">${escapeHtml(service.name)}</a></h2>
@@ -142,9 +145,9 @@ function card(service) {
   </div>${responseTime}
   ${renderBar(service.days)}
   <div class="bar-legend">
-    <span>${service.days.length} days ago</span>
+    <span>${escapeHtml(service.days[0]?.date ?? "")}</span>
     <span>${escapeHtml(uptimeLabel(stats))}</span>
-    <span>Today</span>
+    <span>${escapeHtml(service.days.at(-1)?.date ?? "")}</span>
   </div>
 </div>`;
 }
@@ -207,7 +210,7 @@ ${services.map(card).join("\n")}
 ${legend()}
 ${note}
 <footer>
-  Updated <time datetime="${generatedAt.toISOString()}">${generatedAt
+  Data as of <time datetime="${generatedAt.toISOString()}">${generatedAt
       .toISOString()
       .replace("T", " ")
       .slice(0, 16)} UTC</time> ·
@@ -275,9 +278,9 @@ ${windows
 <h2>Last ${service.days.length} days</h2>
 ${renderBar(service.days)}
 <div class="bar-legend">
-  <span>${service.days.length} days ago</span>
+  <span>${escapeHtml(service.days[0]?.date ?? "")}</span>
   <span>${escapeHtml(uptimeLabel(stats))}</span>
-  <span>Today</span>
+  <span>${escapeHtml(service.days.at(-1)?.date ?? "")}</span>
 </div>
 ${legend()}
 ${nodataNote(service.days)}
@@ -290,7 +293,7 @@ ${
 }
 
 <footer>
-  Updated <time datetime="${generatedAt.toISOString()}">${generatedAt
+  Data as of <time datetime="${generatedAt.toISOString()}">${generatedAt
       .toISOString()
       .replace("T", " ")
       .slice(0, 16)} UTC</time> ·

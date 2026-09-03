@@ -130,9 +130,34 @@ test("status is carried in text, not by hue alone", () => {
   assert.match(html, /aria-label="[^"]*2 days outage/);
 });
 
-test("cards show the current response time", () => {
+test("cards label the response time as an all-time average, not a current reading", () => {
+  // summary.json's `time` is the mean across all history. The old label said
+  // "Response time", which reads as how the service is performing right now.
   const html = renderIndex(opts([service({ time: 620 })]));
-  assert.match(html, /Response time <b>620 ms<\/b>/);
+  assert.match(html, /All-time avg <b>620 ms<\/b>/);
+  assert.doesNotMatch(html, /Response time <b>/);
+});
+
+test("the bar is labelled with real dates, not the word Today", () => {
+  // The page is rebuilt on a schedule GitHub often skips, so the last drawn day
+  // may not be today. A date stays true however stale the build is.
+  const days = [
+    { date: "2026-06-05", status: "up", checks: 1, avgResponseTimeMs: 100 },
+    { date: "2026-06-06", status: "up", checks: 1, avgResponseTimeMs: 100 },
+  ];
+  const html = renderIndex(opts([service({ days })]));
+  assert.match(html, /<span>2026-06-05<\/span>/);
+  assert.match(html, /<span>2026-06-06<\/span>/);
+  assert.doesNotMatch(html, />Today</);
+  assert.doesNotMatch(html, /days ago</);
+});
+
+test("the footer claims data age, not a refresh time", () => {
+  // The timestamp is the newest observation. "Updated" implied the page itself
+  // refreshed then, which is a stronger claim than the data supports.
+  const html = renderIndex(opts([service()]));
+  assert.match(html, /Data as of <time/);
+  assert.doesNotMatch(html, /Updated <time/);
 });
 
 test("a card without a response time omits the line rather than printing junk", () => {
