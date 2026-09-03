@@ -48,3 +48,75 @@ test("tolerates a missing metrics clause", () => {
   assert.equal(o.code, null);
   assert.equal(o.responseTimeMs, null);
 });
+
+// --- check-definition changes -------------------------------------------------
+// A service's target can be redefined. When it is, older observations measured
+// something else and must not be presented as history for the current check.
+
+import { parseObservationLog, forCurrentTarget } from "../lib/parse-history.mjs";
+
+const block = (iso, subject, patch) => `\u0000${iso}\t${subject}\n\n${patch}\n`;
+
+const PATCH_CHANGED = `diff --git a/history/api.yml b/history/api.yml
+@@ -1,7 +1,7 @@
+-url: https://api.nomercy.tv
++url: https://api.nomercy.tv/v1/server
+ status: up
+`;
+
+const PATCH_CONTEXT = `diff --git a/history/api.yml b/history/api.yml
+@@ -1,7 +1,7 @@
+ url: https://api.nomercy.tv
+ status: up
+-responseTime: 465
++responseTime: 430
+`;
+
+test("takes the new url when a commit changes it", () => {
+  const [o] = parseObservationLog(block("2026-09-02T01:13:54Z", "🟩 API is up (302 in 95 ms)", PATCH_CHANGED));
+  assert.equal(o.url, "https://api.nomercy.tv/v1/server");
+  assert.equal(o.status, "up");
+});
+
+test("takes the url from context when the commit did not change it", () => {
+  const [o] = parseObservationLog(block("2026-06-17T00:10:40Z", "🔔 API is up (200 in 430 ms)", PATCH_CONTEXT));
+  assert.equal(o.url, "https://api.nomercy.tv");
+});
+
+test("returns observations oldest first", () => {
+  const log =
+    block("2026-09-02T01:13:54Z", "🟩 API is up (302 in 95 ms)", PATCH_CHANGED) +
+    block("2026-06-17T00:10:40Z", "🔔 API is up (200 in 430 ms)", PATCH_CONTEXT);
+  const observations = parseObservationLog(log);
+  assert.equal(observations.length, 2);
+  assert.ok(observations[0].at < observations[1].at);
+});
+
+test("carries the url forward when a commit shows no url line", () => {
+  // Merge commits produce no patch under `git log -p`.
+  const log =
+    block("2026-06-18T00:00:00Z", "🔔 API is up (200 in 400 ms)", "diff --git a/history/api.yml b/history/api.yml\n") +
+    block("2026-06-17T00:10:40Z", "🔔 API is up (200 in 430 ms)", PATCH_CONTEXT);
+  const observations = parseObservationLog(log);
+  assert.equal(observations[1].url, "https://api.nomercy.tv", "should inherit the earlier url");
+});
+
+test("forCurrentTarget drops observations of a previous target", () => {
+  const log =
+    block("2026-09-02T01:13:54Z", "🟩 API is up (302 in 95 ms)", PATCH_CHANGED) +
+    block("2026-06-17T00:10:40Z", "🔔 API is up (200 in 430 ms)", PATCH_CONTEXT);
+  const kept = forCurrentTarget(parseObservationLog(log));
+  assert.equal(kept.length, 1, "the June observation measured a different URL");
+  assert.equal(kept[0].url, "https://api.nomercy.tv/v1/server");
+});
+
+test("forCurrentTarget keeps everything when the target never changed", () => {
+  const log =
+    block("2026-06-18T00:00:00Z", "🔔 API is up (200 in 400 ms)", PATCH_CONTEXT) +
+    block("2026-06-17T00:10:40Z", "🔔 API is up (200 in 430 ms)", PATCH_CONTEXT);
+  assert.equal(forCurrentTarget(parseObservationLog(log)).length, 2);
+});
+
+test("forCurrentTarget on an empty list is empty", () => {
+  assert.deepEqual(forCurrentTarget([]), []);
+});

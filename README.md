@@ -85,6 +85,15 @@ not throttled, so a check can be triggered on demand:
 gh api -X POST repos/NoMercy-Entertainment/nomercy-status/dispatches   -f event_type=uptime
 ```
 
+**Redefining a check discards its old history, on purpose.** An observation is
+only kept if it measured the URL the check points at *today*. When `API` moved
+from `https://api.nomercy.tv` to `/v1/server`, the earlier observations stopped
+counting -- the apex is a shared Cloudflare front door that answers for several
+hostnames, so those days measured the front door, not the API. Presenting them
+as API history would be a lie of exactly the kind the grey band exists to avoid.
+Those days become "no monitoring data" instead, and the bar recovers as real
+observations accumulate.
+
 **The workflow files are generated.** All eight Upptime workflows are rewritten
 by `update-template`; put customisations in `.upptimerc.yml` instead. Only
 `status-site.yml` is hand-maintained, and its name is deliberately not one of

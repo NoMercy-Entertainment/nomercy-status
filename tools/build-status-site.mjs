@@ -2,7 +2,7 @@
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readObservations } from "./lib/parse-history.mjs";
+import { readCurrentObservations } from "./lib/parse-history.mjs";
 import { classifyDays } from "./lib/classify-days.mjs";
 import { renderIndex, renderDetail } from "./lib/render-page.mjs";
 import { readI18n } from "./lib/config-block.mjs";
@@ -47,7 +47,7 @@ export function buildSite({
   let newestObservedAt = null;
 
   const services = summary.map((entry) => {
-    const observations = readObservations(entry.slug, cwd);
+    const observations = readCurrentObservations(entry.slug, cwd);
     const latest = observations.at(-1)?.at;
     if (latest && (!newestObservedAt || latest > newestObservedAt)) newestObservedAt = latest;
     return {
