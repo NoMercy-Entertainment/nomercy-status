@@ -1,6 +1,14 @@
 owner: NoMercy-Entertainment
 repo: nomercy-status
 
+# Upptime opens a GitHub Issue when a service goes down and closes it on recovery.
+# Unassigned, that issue notifies nobody -- it just sits in the tracker. Assigning
+# it is what turns an incident into something a person actually hears about, and it
+# needs no webhook or secret. Both logins verified assignable on this repo.
+assignees:
+  - Fill84
+  - StoneyEagle
+
 # Upptime will otherwise set the repo description, homepage and topics for you.
 # All three are already set here, so those calls short-circuit anyway — pinning
 # them off keeps it that way, so GH_PAT never needs repo Administration rights.
@@ -167,17 +175,22 @@ i18n:
   incidentReport: Incident Report
 
 workflowSchedule:
-  graphs: "0 0 * * *"
-  responseTime: "0 23 * * *"
-  staticSite: "0 1 * * *"
-  summary: "0 0 * * *"
-  updateTemplate: "0 0 * * *"
+  # Deliberately odd minutes. GitHub delays scheduled runs most at the start of the
+  # hour, and explicitly advises scheduling away from it; every entry here used to
+  # sit on :00. Order is intentional: the response-time heartbeat closes out the
+  # day, then graphs and summary regenerate the data the page is built from.
+  responseTime: "23 23 * * *"
+  graphs: "17 0 * * *"
+  summary: "29 0 * * *"
+  updateTemplate: "53 0 * * *"
+  staticSite: "41 1 * * *"
   # `uptime` is the monitoring loop; `updates` is the dependency-bump workflow.
   # These were previously conflated under `updates`, which worked only because
   # Uptime CI fell back to a default of the same value — and which would have
   # run Updates CI every five minutes once its workflow was regenerated.
-  uptime: "*/5 * * * *"
-  updates: "0 3 * * *"
+  # :02, :07 ... :57 -- every five minutes, but never on the hour boundary.
+  uptime: "2-57/5 * * * *"
+  updates: "37 3 * * *"
 
 commitMessages:
   # $PREFIX is required. Upptime reads a site's current status back from the
