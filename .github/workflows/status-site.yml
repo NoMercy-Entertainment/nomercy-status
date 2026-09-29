@@ -16,7 +16,7 @@ jobs:
     runs-on: [self-hosted, Linux, X64, beast-unit]
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # Matches the ref every Upptime-generated workflow checks out. On the
           # schedule and dispatch triggers this resolves to the default branch
@@ -30,7 +30,7 @@ jobs:
       # Nothing else in this repo runs `node` directly, so the self-hosted runner is
       # not guaranteed to have one -- and `observations.at(-1)` needs >= 16.6.
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "20"
       - name: Run tests
