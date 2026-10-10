@@ -4,22 +4,23 @@
     "url": "https://nomercy.tv",
     "icon": "https://cdn.nomercy.tv/logo.png",
     "slug": "website",
-    "status": "up",
+    "status": "down",
     "uptime": "99.89%",
-    "uptimeDay": "100.00%",
+    "uptimeDay": "99.99%",
     "uptimeWeek": "100.00%",
     "uptimeMonth": "100.00%",
     "uptimeYear": "99.89%",
-    "time": 570,
-    "timeDay": 446,
-    "timeWeek": 446,
-    "timeMonth": 409,
-    "timeYear": 570,
+    "time": 567,
+    "timeDay": 260,
+    "timeWeek": 260,
+    "timeMonth": 393,
+    "timeYear": 567,
     "dailyMinutesDown": {
       "2026-03-16": 184,
       "2026-03-22": 34,
       "2026-04-09": 66,
-      "2026-04-10": 54
+      "2026-04-10": 54,
+      "2026-10-10": 0
     }
   },
   {
@@ -112,7 +113,7 @@
     "time": 187,
     "timeDay": 223,
     "timeWeek": 223,
-    "timeMonth": 203,
+    "timeMonth": 209,
     "timeYear": 187,
     "dailyMinutesDown": {}
   },
@@ -130,7 +131,7 @@
     "time": 201,
     "timeDay": 195,
     "timeWeek": 195,
-    "timeMonth": 210,
+    "timeMonth": 203,
     "timeYear": 201,
     "dailyMinutesDown": {}
   }
