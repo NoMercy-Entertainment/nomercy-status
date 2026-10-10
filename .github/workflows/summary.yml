@@ -26,6 +26,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   release:
+    timeout-minutes: 7200
     name: Generate README
     runs-on: [self-hosted, Linux, X64, beast-unit]
     env:

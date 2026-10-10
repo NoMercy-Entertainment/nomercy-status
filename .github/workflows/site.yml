@@ -29,6 +29,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   release:
+    timeout-minutes: 7200
     name: Build and deploy site
     runs-on: [self-hosted, Linux, X64, beast-unit]
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
