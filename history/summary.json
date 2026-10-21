@@ -4,24 +4,25 @@
     "url": "https://nomercy.tv",
     "icon": "https://cdn.nomercy.tv/logo.png",
     "slug": "website",
-    "status": "up",
+    "status": "down",
     "uptime": "99.81%",
-    "uptimeDay": "100.00%",
+    "uptimeDay": "99.97%",
     "uptimeWeek": "98.13%",
     "uptimeMonth": "99.40%",
     "uptimeYear": "99.81%",
-    "time": 564,
-    "timeDay": 478,
-    "timeWeek": 467,
-    "timeMonth": 460,
-    "timeYear": 564,
+    "time": 561,
+    "timeDay": 288,
+    "timeWeek": 430,
+    "timeMonth": 439,
+    "timeYear": 561,
     "dailyMinutesDown": {
       "2026-03-16": 184,
       "2026-03-22": 34,
       "2026-04-09": 66,
       "2026-04-10": 54,
       "2026-10-10": 73,
-      "2026-10-14": 188
+      "2026-10-14": 188,
+      "2026-10-21": 0
     }
   },
   {
@@ -29,21 +30,22 @@
     "url": "https://api.nomercy.tv/v1/server",
     "icon": "https://cdn.nomercy.tv/logo.png",
     "slug": "api",
-    "status": "up",
+    "status": "down",
     "uptime": "99.92%",
-    "uptimeDay": "100.00%",
+    "uptimeDay": "99.99%",
     "uptimeWeek": "100.00%",
     "uptimeMonth": "100.00%",
     "uptimeYear": "99.92%",
-    "time": 446,
-    "timeDay": 102,
-    "timeWeek": 104,
-    "timeMonth": 96,
-    "timeYear": 446,
+    "time": 450,
+    "timeDay": 599,
+    "timeWeek": 228,
+    "timeMonth": 135,
+    "timeYear": 450,
     "dailyMinutesDown": {
       "2026-03-16": 184,
       "2026-03-22": 34,
-      "2026-04-16": 45
+      "2026-04-16": 45,
+      "2026-10-21": 0
     }
   },
   {
@@ -78,7 +80,7 @@
     "time": 181,
     "timeDay": 75,
     "timeWeek": 78,
-    "timeMonth": 75,
+    "timeMonth": 71,
     "timeYear": 181,
     "dailyMinutesDown": {}
   },
@@ -96,7 +98,7 @@
     "time": 201,
     "timeDay": 67,
     "timeWeek": 68,
-    "timeMonth": 68,
+    "timeMonth": 66,
     "timeYear": 201,
     "dailyMinutesDown": {}
   },
@@ -114,7 +116,7 @@
     "time": 202,
     "timeDay": 220,
     "timeWeek": 269,
-    "timeMonth": 226,
+    "timeMonth": 224,
     "timeYear": 202,
     "dailyMinutesDown": {}
   },
@@ -132,7 +134,7 @@
     "time": 204,
     "timeDay": 228,
     "timeWeek": 222,
-    "timeMonth": 214,
+    "timeMonth": 212,
     "timeYear": 204,
     "dailyMinutesDown": {}
   }
