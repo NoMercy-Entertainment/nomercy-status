@@ -4,16 +4,16 @@
     "url": "https://nomercy.tv",
     "icon": "https://cdn.nomercy.tv/logo.png",
     "slug": "website",
-    "status": "down",
+    "status": "up",
     "uptime": "99.74%",
-    "uptimeDay": "99.89%",
-    "uptimeWeek": "97.45%",
-    "uptimeMonth": "98.82%",
+    "uptimeDay": "99.49%",
+    "uptimeWeek": "97.40%",
+    "uptimeMonth": "98.81%",
     "uptimeYear": "99.74%",
     "time": 552,
-    "timeDay": 271,
-    "timeWeek": 355,
-    "timeMonth": 429,
+    "timeDay": 347,
+    "timeWeek": 368,
+    "timeMonth": 431,
     "timeYear": 552,
     "dailyMinutesDown": {
       "2026-03-16": 184,
@@ -23,7 +23,7 @@
       "2026-10-10": 73,
       "2026-10-14": 188,
       "2026-10-21": 255,
-      "2026-10-24": 2
+      "2026-10-24": 7
     }
   },
   {
@@ -31,23 +31,23 @@
     "url": "https://api.nomercy.tv/v1/server",
     "icon": "https://cdn.nomercy.tv/logo.png",
     "slug": "api",
-    "status": "down",
+    "status": "up",
     "uptime": "99.84%",
-    "uptimeDay": "99.90%",
-    "uptimeWeek": "97.46%",
-    "uptimeMonth": "99.41%",
+    "uptimeDay": "99.50%",
+    "uptimeWeek": "97.40%",
+    "uptimeMonth": "99.40%",
     "uptimeYear": "99.84%",
-    "time": 439,
-    "timeDay": 100,
-    "timeWeek": 206,
-    "timeMonth": 136,
-    "timeYear": 439,
+    "time": 437,
+    "timeDay": 121,
+    "timeWeek": 202,
+    "timeMonth": 137,
+    "timeYear": 437,
     "dailyMinutesDown": {
       "2026-03-16": 184,
       "2026-03-22": 34,
       "2026-04-16": 45,
       "2026-10-21": 255,
-      "2026-10-24": 1
+      "2026-10-24": 7
     }
   },
   {
@@ -55,19 +55,19 @@
     "url": "https://app.nomercy.tv",
     "icon": "https://cdn.nomercy.tv/logo.png",
     "slug": "app",
-    "status": "down",
-    "uptime": "100.00%",
-    "uptimeDay": "99.92%",
-    "uptimeWeek": "99.99%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
-    "time": 165,
-    "timeDay": 125,
-    "timeWeek": 177,
-    "timeMonth": 222,
-    "timeYear": 165,
+    "status": "up",
+    "uptime": "99.99%",
+    "uptimeDay": "99.52%",
+    "uptimeWeek": "99.93%",
+    "uptimeMonth": "99.98%",
+    "uptimeYear": "99.99%",
+    "time": 169,
+    "timeDay": 199,
+    "timeWeek": 195,
+    "timeMonth": 227,
+    "timeYear": 169,
     "dailyMinutesDown": {
-      "2026-10-24": 1
+      "2026-10-24": 7
     }
   },
   {
@@ -75,19 +75,19 @@
     "url": "https://auth.nomercy.tv/realms/master",
     "icon": "https://cdn.nomercy.tv/logo.png",
     "slug": "authentication",
-    "status": "down",
+    "status": "up",
     "uptime": "100.00%",
-    "uptimeDay": "99.94%",
-    "uptimeWeek": "99.99%",
-    "uptimeMonth": "100.00%",
+    "uptimeDay": "99.53%",
+    "uptimeWeek": "99.93%",
+    "uptimeMonth": "99.98%",
     "uptimeYear": "100.00%",
-    "time": 179,
-    "timeDay": 151,
-    "timeWeek": 90,
-    "timeMonth": 78,
-    "timeYear": 179,
+    "time": 178,
+    "timeDay": 149,
+    "timeWeek": 96,
+    "timeMonth": 80,
+    "timeYear": 178,
     "dailyMinutesDown": {
-      "2026-10-24": 1
+      "2026-10-24": 7
     }
   },
   {
@@ -95,19 +95,19 @@
     "url": "https://cdn.nomercy.tv/logo.png",
     "icon": "https://cdn.nomercy.tv/logo.png",
     "slug": "cdn",
-    "status": "down",
+    "status": "up",
     "uptime": "100.00%",
-    "uptimeDay": "99.95%",
-    "uptimeWeek": "99.99%",
-    "uptimeMonth": "100.00%",
+    "uptimeDay": "99.55%",
+    "uptimeWeek": "99.94%",
+    "uptimeMonth": "99.99%",
     "uptimeYear": "100.00%",
-    "time": 198,
-    "timeDay": 105,
-    "timeWeek": 75,
-    "timeMonth": 69,
-    "timeYear": 198,
+    "time": 197,
+    "timeDay": 107,
+    "timeWeek": 79,
+    "timeMonth": 71,
+    "timeYear": 197,
     "dailyMinutesDown": {
-      "2026-10-24": 1
+      "2026-10-24": 7
     }
   },
   {
@@ -115,19 +115,19 @@
     "url": "https://docs.nomercy.tv",
     "icon": "https://cdn.nomercy.tv/logo.png",
     "slug": "docs",
-    "status": "down",
-    "uptime": "100.00%",
-    "uptimeDay": "99.97%",
-    "uptimeWeek": "100.00%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
-    "time": 201,
-    "timeDay": 171,
-    "timeWeek": 235,
-    "timeMonth": 227,
-    "timeYear": 201,
+    "status": "up",
+    "uptime": "99.99%",
+    "uptimeDay": "99.56%",
+    "uptimeWeek": "99.94%",
+    "uptimeMonth": "99.99%",
+    "uptimeYear": "99.99%",
+    "time": 202,
+    "timeDay": 197,
+    "timeWeek": 237,
+    "timeMonth": 228,
+    "timeYear": 202,
     "dailyMinutesDown": {
-      "2026-10-24": 0
+      "2026-10-24": 6
     }
   },
   {
@@ -135,19 +135,19 @@
     "url": "https://repo.nomercy.tv",
     "icon": "https://cdn.nomercy.tv/logo.png",
     "slug": "packages",
-    "status": "down",
-    "uptime": "100.00%",
-    "uptimeDay": "99.99%",
-    "uptimeWeek": "100.00%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
-    "time": 208,
-    "timeDay": 159,
-    "timeWeek": 241,
-    "timeMonth": 218,
-    "timeYear": 208,
+    "status": "up",
+    "uptime": "99.99%",
+    "uptimeDay": "99.57%",
+    "uptimeWeek": "99.94%",
+    "uptimeMonth": "99.99%",
+    "uptimeYear": "99.99%",
+    "time": 209,
+    "timeDay": 194,
+    "timeWeek": 243,
+    "timeMonth": 220,
+    "timeYear": 209,
     "dailyMinutesDown": {
-      "2026-10-24": 0
+      "2026-10-24": 6
     }
   }
 ]
