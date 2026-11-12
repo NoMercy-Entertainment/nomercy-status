@@ -24,6 +24,8 @@ on:
 concurrency:
   group: ${{ github.repository }}-${{ github.head_ref || github.ref_name }}-upptime
   cancel-in-progress: false
+permissions:
+  contents: write
 jobs:
   release:
     timeout-minutes: 7200
@@ -49,6 +51,6 @@ jobs:
           ref: ${{ github.head_ref || github.ref_name }}
           token: ${{ steps.app_token.outputs.token || secrets.GH_PAT || github.token }}
       - name: Update code
-        uses: upptime/updates@master
+        uses: upptime/updates@b040558e532ff5cce1b7c0153620f2902ea67929 # master, no release tag exists
         env:
           GH_PAT: ${{ steps.app_token.outputs.token || secrets.GH_PAT || github.token }}
